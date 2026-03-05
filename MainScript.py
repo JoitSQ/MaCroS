@@ -75,9 +75,6 @@ def IPSetGlobalFetch():
     #Define IP Adress and port
     with open(r"C:\MaCroS\P2PT\H-C\ipset.txt", 'x') as ipset:
         ipset.write(input("Please enter your OWN IPv4 adress. It can be accessed by typing 'ipconfig' in command prompt and looking at your active connection method (e.g. Ethernet adapter). \n"))
-        ipset.write(input('Please enter IP-v4 address: ') + '\n')
-        ipset.write(input('Please enter the port: '))
-
         ipset.write('\n' + ' ')
     with open(r"C:\MaCroS\P2PT\H-C\history-client-out.txt", 'x') as history:
         pass
@@ -91,28 +88,43 @@ elif not Path(r"C:\MaCroS\P2PT\H-C").exists():
     Path.mkdir(Path("C:/MaCroS/P2PT"), exist_ok=True)
     Path.mkdir(Path("C:/MaCroS/P2PT/H-C"), exist_ok=True)
     IPSetGlobalFetch()
-    PORT = 1
+    PORT = 54886
     exit()
+PORT=54886
+if Path(r"C:\MaCroS\config.txt").exists():
+    pass
+elif not Path(r"C:\MaCroS\config.txt").exists():
+    with open(r"C:\MaCroS\config.txt", 'x') as config:
+        config.write('0\n')
+        config.write('1\n')
+with open(r"C:\MaCroS\config.txt", 'r') as config:
+    contactnum=config.readline(1)
+    print(contactnum)
+    int(contactnum)
+    print(contactnum)
+int(contactnum)
 
+TARGET_HOST=[]
+TARGET_PORT=54886
+HOST=''
+
+# Broken for now, will fix tmrw
 def IPSetinit():
-    global target_host, target_port
+    global target_host, contactnum, HOST
     target_host = ''
-    target_port = ''
-
+    int(contactnum)
     with open(r"C:\MaCroS\P2PT\H-C\ipset.txt", 'r') as ipset:
         ippp=ipset.readlines()
         for i in range(len(ippp)):
-            if ippp[i]!=' ' and ippp[i+1]!=' ':
-                TARGET_HOST = ippp[i]
-                TARGET_PORT = ippp[i+1]
-        for i in TARGET_HOST:
-            if i !='\n':
-                target_host+=i
-        for i in TARGET_PORT:
-            if i !='\n':
-                target_port+=i
-        int(target_port)
+            if i==0:
+                HOST=ippp[i]
+            else:
+                TARGET_HOST.append(ippp[i])
 
+
+IPSetinit()
+print(HOST)
+print(TARGET_HOST)
 
 # IPSet loaded
 
@@ -121,10 +133,12 @@ def IPSetinit():
 counter=1
 connected=0
 
+
+
+# Useless shit for now, doesn't get invoked ANYWHERE
 # Connecting to host
 def actualconnect():
     global connected, target_host, target_port
-    IPSetinit()
     try:
         # Create a TCP/IP socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -155,46 +169,42 @@ def actualconnect():
         # At this point, if code before fails this program will not function without restart, I believe
 
 
-# Actually display line 87 and line 92 messages along with the state of connection
+# Be a menace and make them wait 2 seconds before actually booting up
 def connecttext():
     global connected
+    time.sleep(2)
+    error.configure(text='')
+    text.configure(text='Success!')
 
-    # Try to connect 5 times
-    for i in range(5):
-        text.configure(text='Connecting...')
-        # Change text, try connecting
-        actualconnect()
-        # If results positive without interruptions - break from loop and don't try to connect further
-        if connected==1:
-            time.sleep(1)
-            break
+    # Let the user read the text, 1 second should be enough
+    time.sleep(1)
 
-    # Actually check connection probe results
-    if connected==0:
-        text.configure(text='Failed')
-        # If came back negative, change text stating so and don't do shit anymore. After this point,
-        # The program is not functional and requires a restart along with Host dummy to work
-    if connected==1:
-        # If results came back positive - configure text to say so
-        error.configure(text='')
-        text.configure(text='Success!')
+    # Initiate actual functionality of program
+    start_fade()
 
-        # Let the user read the text, 1 second should be enough
-        time.sleep(1)
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((HOST, PORT))
+            s.listen()
+            conn, addr = s.accept()
+            with conn:
+                print('Connected by', addr)
+                while True:
+                    data = conn.recv(1024)
 
-        # Initiate actual functionality of program
-        start_fade()
+# old code remains
 
-        # KILL. THREAD.
-        sys.exit()
-        # I hate this line in particular because this means what? This means that I decided to kill the thread
-        # BY FORCEFULLY SHUTTING IT DOWN
-        # I have no other way to do so, and that is quite unfortunate, let me explain why
-        # The Threading system in Python doesn't natively support something stupid like this
-        # The said action can cause memory leaks and instability in program's functionality
-        # I tried some alternatives but shit failed miserably, so I don't have any
-        # This is why I HEAVILY recommend getting the fuck away from this line and never question it
-        # Because it works, just like intended, so PLEASE DON'T TRY TO INTERFERE THIS WILL BREAK SHIT
+    # KILL. THREAD.
+
+    # sys.exit()
+    # I hate this line in particular because this means what? This means that I decided to kill the thread
+    # BY FORCEFULLY SHUTTING IT DOWN
+    # I have no other way to do so, and that is quite unfortunate, let me explain why
+    # The Threading system in Python doesn't natively support something stupid like this
+    # The said action can cause memory leaks and instability in program's functionality
+    # I tried some alternatives but shit failed miserably, so I don't have any
+    # This is why I HEAVILY recommend getting the fuck away from this line and never question it
+    # Because it works, just like intended, so PLEASE DON'T TRY TO INTERFERE THIS WILL BREAK SHIT
 
 
 # Start a thread above, connecting alongside mainloop
@@ -340,13 +350,13 @@ def MenuInit():
 
 windowtext=''
 previousmessages=ttk.Label()
-
+msgindex=0
 
 def getdate():
     global msgindex
-    # Being a smart ass (not) i am i will make this dependant NOT on IDS but on date
-    msgindex= round(time.time(), 1)
-
+    # Being a smart ass (not) i am i will make this dependant NOT on IDs but on date
+    msgindex+=1
+    # nvm i caved in and made it on IDs
 
 def SendingTest():
     global message, previousmessages, history, windowtext, msgindex
@@ -385,23 +395,25 @@ message = ttk.Entry(chatwindow, width=200)
 send = ttk.Button(chatwindow, image=sendbi, width=5, command=SendingTest)
 
 
+# yup this is new, will implement chats functionality this is a semiworking placeholder that i did NOT test please leave it alone
+def AddContact(contactnum):
+    with open(r"C:\MaCroS\P2PT\H-C\ipset.txt", 'a') as ipset:
+        ipset.write(input('Please enter IP-v4 address: ') + '\n')
+        messagebox.showinfo('Annoying?','If you want to get rid of console window - restart the program ;)')
+    with open(r"C:\MaCroS\config.txt", 'x') as config:
+        config.write(contactnum+1)
+        contactnum+=1
+
+
 # Add UI elements onto main screen
 
 def mainmenuinit():
-    global windowtext
+    global windowtext, HOST
     windowtext = ''
     send.pack(side='left', anchor='sw', expand=False)
     message.pack(side='bottom', anchor='sw', pady=5, padx=10)
     chatwindow.pack(side='bottom', anchor='se', expand=True)
     SendingTest()
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            print('Connected by', addr)
-            while True:
-                data = conn.recv(1024)
 
 
 # Kickstart this whole mess

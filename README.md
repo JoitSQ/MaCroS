@@ -10,3 +10,6 @@ I am working alone, so any bug fix and/or update will be delayed for at least a 
 
 
 This project is written fully in Python 3.12, with PyCharm as interpreter. No AI was involved.
+
+
+print('Hello world!')
