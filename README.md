@@ -14,5 +14,8 @@ This project is written fully in Python 3.12, with PyCharm as interpreter. No AI
 print('Hello world!')
 ___________________________________________________________________________________________________________
 
+I am NOT an expirienced coder. Please don't harrass anybody over internet just beacause they have horrific coding skills, it's lame 
+(I'm trying to improve though)
+
 2 months of thinking and i came to a conclusion - this project will now be public and ANYONE witout malicious intend can participate. 
 Please DO note, however, that this is my base for my next year school project and any participation will be included there and thoroughly appreciated. Thank you in advance. ;)
