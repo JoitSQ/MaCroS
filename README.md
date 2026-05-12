@@ -1,8 +1,9 @@
 # MaCroS-Code
-Please do not interfere until first released version
+Please do not interfere until first version is released
 This project consists of unfinished code and ideas. Please let me work through them first before interfering. Thank you.
 
 MaCroS is completely free messenger alternative, working on a P2P technology, which means it CAN NOT be blocked in any way without cutting your whole internet access. 
+
 Roskomnadzor will lose!
 
 With Telegram's blockage it is as important as ever to be able to keep in touch with your relatives, family and friends. MaCroS will help with that!
