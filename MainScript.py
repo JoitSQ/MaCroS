@@ -1,3 +1,37 @@
+# Startup script - compile here
+
+# Imports
+
+import sys
+import tkinter as win
+from tkinter import ttk
+import time
+import threading
+import socket
+from pathlib import Path
+import ctypes
+import sys
+
+# Class definition
+
+from UInit import *
+from MemorySync import *
+from Networking import *
+from Anim import Anim
+
+wind = win.Tk()
+
+UI.FirstInit(wind)
+
+Anim.fade(wind, wind)
+
+wind.mainloop()
+
+########################################################################
+
+
+# DEPRECATED FILE REMAINS - KEEP OUT OF THIS NIGHTMARE FUEL
+'''
 # okay now how tf do i connect to internet here
 import sys
 import tkinter as win
@@ -15,7 +49,7 @@ import ctypes
 import sys
 
 # Apply admin privileges
-'''
+
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -28,20 +62,13 @@ if not is_admin():
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     msg = messagebox.showerror('An exception has occurred', 'Please rerun this program with admin privileges. ')
     #sys.exit()
-'''
 
-'''
-Pallete to test
 
-Background:   #dbeaff
-Glass panel:  #f7fbff
-Border:       #b9d1ff
-Accent:       #4aa3ff
-'''
+
 
 # Window init
 
-wind = win.Tk()
+wind=win.Tk()
 
 wind.geometry('800x800')
 
@@ -67,6 +94,7 @@ sendbi=PhotoImage(file=r'Images/sendbutton.png')
 popupmenu = win.Frame(glass, bg="#f8fbff")
 
 # Finalizing fist stage prep for window
+
 
 # Loading IP set
 # This only works for ONE IP Adress and ONE Port placed consecutively on different lines
@@ -117,10 +145,12 @@ def IPSetinit():
         ippp=ipset.readlines()
         for i in range(len(ippp)):
             if i==0:
-                HOST=ippp[i]
+                host=ippp[i]
             else:
                 TARGET_HOST.append(ippp[i])
-
+    for i in host:
+        if i!='\n':
+            HOST+=i
 
 IPSetinit()
 print(HOST)
@@ -132,7 +162,12 @@ print(TARGET_HOST)
 # Loading variables for this shit to work properly
 counter=1
 connected=0
+sendd=0
 
+# In case i need to deliver updates here
+def sendS():
+    global sendd
+    sendd=1
 
 
 # Useless shit for now, doesn't get invoked ANYWHERE
@@ -171,7 +206,7 @@ def actualconnect():
 
 # Be a menace and make them wait 2 seconds before actually booting up
 def connecttext():
-    global connected
+    global connected, sendd
     time.sleep(2)
     error.configure(text='')
     text.configure(text='Success!')
@@ -181,16 +216,18 @@ def connecttext():
 
     # Initiate actual functionality of program
     start_fade()
-
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((HOST, PORT))
             s.listen()
             conn, addr = s.accept()
             with conn:
-                print('Connected by', addr)
                 while True:
                     data = conn.recv(1024)
+                    opp+=data
+                if sendd==1:
+                    s.send(messageinput)
+                    sendd=0
 
 # old code remains
 
@@ -267,7 +304,7 @@ def fadeback():
 
 #################################################################################################
 
-'''
+
 ⌈¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯⌉
 |         /\                                                                  |
 |        /  \                                                                 |
@@ -279,23 +316,22 @@ def fadeback():
 ⌊_____________________________________________________________________________⌋
 
 (i spent a lot of time on this ASCII art...)
-'''
+
 # Functionality incoming :D
 #################################################################################################
 
 # Initializing the popup menu itself
 def popup():
-    global bFrame1
     # Add items to the popup menu
     MenuInit()
     # Destroy the button to call the popup
     send.pack_forget()
     message.pack_forget()
     chatwindow.pack_forget()
-    bFrame1.pack_forget()
+    sidebar.pack_forget()
     chatwindow.pack_forget()
     # Reloading the popup menu button
-    bFrame1=win.Frame(glass)
+
 
 # Destroying the popup menu
 def popupdestroy():
@@ -303,11 +339,7 @@ def popupdestroy():
     # Well... destroying the popup menu
     advanced_frame.pack_forget()
     popupmenu.pack_forget()
-    # Returning the popup menu button
-    popupmenub = ttk.Button(bFrame1, text="Menu", command=popup, width=6)
-    # Packing the button back in its place
-    popupmenub.pack()
-    bFrame1.pack(side='left', anchor='nw', padx=5, pady=5, expand=True)
+    sidebar.pack(side='left', anchor='nw', padx=5, pady=5, expand=True)
     chatwindow.pack(side='bottom', anchor='se', expand=True)
     send.pack(side='left', anchor='sw', expand=False)
     message.pack(side='bottom', anchor='sw', pady=5, padx=10)
@@ -364,6 +396,7 @@ def SendingTest():
     previousmessages.pack_forget()
     previousmessages=win.Label(chatwindow, text=windowtext, bg="#f8fbff", justify='right')
     messageinput=message.get()
+    sendS()
     if messageinput!='':
         history = open(r"C:\MaCroS\P2PT\H-C\history-client-out.txt", 'a', encoding='utf-8')
         getdate()
@@ -386,33 +419,41 @@ def SendingTest():
 ###############################
 
 
+#contact=[]
+#contact.append('Local computer')
 
-# Initial button seen
-popupmenub = ttk.Button(bFrame1, text="Menu", command=popup, width=6)
-popupmenub.pack()
+sidebar = win.Frame(glass, bg = '#dbeaff')
+popupmenub = ttk.Button(sidebar, text="Menu", command=popup, width=6)
+#chat1=ttk.Button(sidebar, text=contact[0])
 chatwindow = win.Frame(glass, bg="#f8fbff")
 message = ttk.Entry(chatwindow, width=200)
 send = ttk.Button(chatwindow, image=sendbi, width=5, command=SendingTest)
 
 
-# yup this is new, will implement chats functionality this is a semiworking placeholder that i did NOT test please leave it alone
-def AddContact(contactnum):
+# scraps, delayed
+def AddContact():
     with open(r"C:\MaCroS\P2PT\H-C\ipset.txt", 'a') as ipset:
         ipset.write(input('Please enter IP-v4 address: ') + '\n')
+        ipset.write(input("Enter Contact's name: \n"))
         messagebox.showinfo('Annoying?','If you want to get rid of console window - restart the program ;)')
-    with open(r"C:\MaCroS\config.txt", 'x') as config:
+    with open(r"C:\MaCroS\config.txt", 'a') as config:
         config.write(contactnum+1)
-        contactnum+=1
+        contactnum += 1
 
+
+#AddC = ttk.Button(sidebar, width = 5, text='Add Contact', command=AddContact)
 
 # Add UI elements onto main screen
 
 def mainmenuinit():
     global windowtext, HOST
     windowtext = ''
+    sidebar.pack(side='left', anchor='ne', expand=True, pady=5)
     send.pack(side='left', anchor='sw', expand=False)
     message.pack(side='bottom', anchor='sw', pady=5, padx=10)
     chatwindow.pack(side='bottom', anchor='se', expand=True)
+#   AddC.pack(side='bottom', anchor = 'sw', expand=True)
+    popupmenub.pack(side='top', anchor='nw', expand=True)
     SendingTest()
 
 
@@ -420,3 +461,4 @@ def mainmenuinit():
 start_task()
 
 wind.mainloop()
+'''
