@@ -1,5 +1,5 @@
-from UInit import *
-
+from UInit import UI
+import tkinter
 
 class MemorySync():
     def __init__(self):
@@ -27,10 +27,10 @@ class MemorySync():
                 if j == '⁝':
                     break
             UI.windowtext += '\n'
-        UI.previousmessages.configure(text=windowtext)
+        UI.previousmessages.configure(text=UI.windowtext)
         UI.previousmessages.pack(side='bottom', anchor='e')
         history.close()
-        UI.message.delete('0', win.END)
+        UI.message.delete('0', tkinter.END)
 
     # def clearchat(self):
     #   history = open(r"C:\MaCroS\P2PT\H-C\history-client-out.txt", 'w')
