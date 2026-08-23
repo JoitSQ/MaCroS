@@ -1,32 +1,31 @@
-from Networking import *
-from MemorySync import *
+# circular imports suck
+# ---------------------------------
 from tkinter import PhotoImage
 # from tkinter import messagebox
 import tkinter as win
 from tkinter import ttk
-#asdasdsadsadsa
+
+
 
 class UI():
 
-    def __init__(self):
-        self.namespace = 'UI'
-    #djusklgfkldjhgjklfdhgjklfdhkjghfjkdhjkgfhdk
+    def __init__(self, windo):
+        from MemorySync import MemorySync
+        from Networking import Networking
+        windo.geometry('800x800')
 
-    def FirstInit(self):
-        self.geometry('800x800')
+        windo.title('messenger duh')
 
-        self.title('messenger duh')
+        self.backg = win.Frame(windo, bg="#dfefff")
 
-        self.bg = win.Frame(self, bg="#dfefff")
+        # self.text = win.Label(self.backg, bg="#dfefff", text='initializing')
+        # self.error = win.Label(self.backg, bg="#dfefff")
+        # self.text.pack(anchor='center', expand=True)
+        # self.error.pack(anchor='center', expand=True)
+        self.backg.pack(fill="both", expand=True)
 
-        self.text = win.Label(self.bg, bg="#dfefff", text='initializing')
-        self.error = win.Label(self.bg, bg="#dfefff")
-        self.text.pack(anchor='center', expand=True)
-        self.error.pack(anchor='center', expand=True)
-        self.bg.pack(fill="both", expand=True)
-
-        self.glass = win.Frame(self.bg, bg="#f8fbff", bd=1, relief="solid")
-
+        self.glass = win.Frame(self.backg, bg="#f8fbff", bd=1, relief="solid")
+        self.sidebar = win.Frame(self.glass, bg='#dbeaff')
         self.advanced_frame = win.Frame(self.glass, bg="#f8fbff")
 
         self.bFrame1 = win.Frame(self.glass)
@@ -42,7 +41,7 @@ class UI():
         self.chatselfow = win.Frame(self.glass, bg="#f8fbff")
         self.message = ttk.Entry(self.chatselfow, width=200)
         self.send = ttk.Button(self.chatselfow, image=self.sendbi, width=5, command=MemorySync.MemoryStorageUpdater)
-        self.sidebar = win.Frame(self.glass, bg='#dbeaff')
+
         self.chatwindow = win.Frame(self.glass, bg="#f8fbff")
         self.message = ttk.Entry(self.chatwindow, width=200)
         self.send = ttk.Button(self.chatwindow, image=self.sendbi, width=5, command=MemorySync.MemoryStorageUpdater)
@@ -53,6 +52,16 @@ class UI():
         self.debugbtn = ttk.Button(self.advanced_frame, text="Debug info")
         self.clearhst = ttk.Button(self.advanced_frame, text='Clear local chat history',
                                    command=MemorySync.MemoryForgor)
+        self.sidebar.pack(side='left', anchor='ne', expand=True, pady=5)
+        self.send.pack(side='left', anchor='sw', expand=False)
+        self.message.pack(side='bottom', anchor='sw', pady=5, padx=10)
+        self.chatwindow.pack(side='bottom', anchor='se', expand=True)
+        self.popupmenub.pack(side='top', anchor='nw', expand=True)
+        # self.glass.pack(padx=30, pady=30, fill="both", expand=True)
+
+    def FirstInit(self, windo):
+        pass
+
 
     def MenuInit(self):
         # Initializing the closing menu button
@@ -88,6 +97,7 @@ class UI():
         self.mainmenuinit()
 
     def mainmenuinit(self):
+        self.glass.pack(padx=30, pady=30, fill="both", expand=True)
         self.sidebar.pack(side='left', anchor='ne', expand=True, pady=5)
         self.send.pack(side='left', anchor='sw', expand=False)
         self.message.pack(side='bottom', anchor='sw', pady=5, padx=10)

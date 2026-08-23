@@ -1,4 +1,6 @@
 # MaCroS-Code
+Please do not interfere until first version is released
+This project consists of unfinished code and ideas. Please let me work through them first before interfering. Thank you.
 
 MaCroS is completely free messenger alternative, working on a P2P technology, which means it CAN NOT be blocked in any way without cutting your whole internet access. 
 
@@ -12,7 +14,3 @@ This project is written fully in Python 3.12, with PyCharm as interpreter. No AI
 
 
 print('Hello world!')
-___________________________________________________________________________________________________________
-
-I am NOT an expirienced coder. Please don't harrass anybody over internet just beacause they have horrific coding skills, it's lame 
-(I'm trying to improve though)

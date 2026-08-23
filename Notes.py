@@ -8,7 +8,7 @@ Accent:       '#4aa3ff'
 
 'Near future' plans:
 
-1. Split the code into multiple files
+1. Split the code into multiple files - D
 
 2. After that, COMPLETE overhaul both on technical AND graphical side once I'm done with the first
 
@@ -16,13 +16,13 @@ Accent:       '#4aa3ff'
 
 Further Plans:
 
-1. Implement server identity
+1. Implement server identity - d
 
-2. Design
+2. Design - d
 
 3. Implement Contacts - d
 
-4. 'Online' status
+4. 'Online' status - d
 
 D - Done
 d- delayed

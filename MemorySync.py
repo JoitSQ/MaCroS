@@ -6,10 +6,11 @@ class MemorySync():
         self.namespace = 'MemorySync'
         self.msgindex = 0
 
+
     def MemoryStorageDate(self):
-        # Being a smart ass (not) i am i will make this dependant NOT on IDs but on date
+        # Being a smart ass (not) I am I will make this dependant NOT on IDs but on date
         self.msgindex += 1
-        # nvm i caved in and made it on IDs
+        # nvm I caved and made it on IDs
 
     def MemoryStorageUpdater(self):
         messageinput = UI.message.get()
@@ -27,7 +28,7 @@ class MemorySync():
                 if j == '⁝':
                     break
             UI.windowtext += '\n'
-        UI.previousmessages.configure(text=UI.windowtext)
+        UI.previousmessages.configure(text=ui.windowtext)
         UI.previousmessages.pack(side='bottom', anchor='e')
         history.close()
         UI.message.delete('0', tkinter.END)
@@ -36,7 +37,7 @@ class MemorySync():
     #   history = open(r"C:\MaCroS\P2PT\H-C\history-client-out.txt", 'w')
     #  history.write('\n')
     # history.close()
-    # UI.clearhst.configure(text='Done!')
+    # ui.clearhst.configure(text='Done!')
     def MemoryForgor(self):
         history = open(r"C:\MaCroS\P2PT\H-C\history-client-out.txt", 'w')
         history.write('\n')

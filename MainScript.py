@@ -14,16 +14,21 @@ import sys
 
 # Class definition
 
-from UInit import *
-from MemorySync import *
-from Networking import *
+from UInit import UI
+from MemorySync import MemorySync
+from Networking import Networking
+
 # from Anim import Anim
 
 wind = win.Tk()
 
-UI.FirstInit(wind)
+ui = UI(wind)
 
-#Anim.fade(wind, wind)
+ui.mainmenuinit()
+
+# thread = threading.Thread(target=Anim().fade, args=(wind, ))
+# thread.start()
+
 
 wind.mainloop()
 
