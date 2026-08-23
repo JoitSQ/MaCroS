@@ -10,6 +10,7 @@ class UI():
 
     def __init__(self):
         self.namespace = 'UI'
+    #djusklgfkldjhgjklfdhgjklfdhkjghfjkdhjkgfhdk
 
     def FirstInit(self):
         self.geometry('800x800')

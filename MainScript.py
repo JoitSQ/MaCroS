@@ -17,13 +17,13 @@ import sys
 from UInit import *
 from MemorySync import *
 from Networking import *
-from Anim import Anim
+# from Anim import Anim
 
 wind = win.Tk()
 
 UI.FirstInit(wind)
 
-Anim.fade(wind, wind)
+#Anim.fade(wind, wind)
 
 wind.mainloop()
 
