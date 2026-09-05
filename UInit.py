@@ -1,13 +1,13 @@
 # circular imports suck
 # ---------------------------------
+from functools import partial
 from tkinter import PhotoImage
 # from tkinter import messagebox
 import tkinter as win
 from tkinter import ttk
 
 
-
-class UI():
+class UI:
 
     def __init__(self, windo):
         from MemorySync import MemorySync
@@ -40,15 +40,16 @@ class UI():
         # chat1=ttk.Button(sidebar, text=contact[0])
         self.chatselfow = win.Frame(self.glass, bg="#f8fbff")
         self.message = ttk.Entry(self.chatselfow, width=200)
-        self.send = ttk.Button(self.chatselfow, image=self.sendbi, width=5, command=MemorySync.MemoryStorageUpdater)
+        self.send = ttk.Button(self.chatselfow, image=self.sendbi, width=5, command=self.MemoryBridge)
 
         self.chatwindow = win.Frame(self.glass, bg="#f8fbff")
         self.message = ttk.Entry(self.chatwindow, width=200)
-        self.send = ttk.Button(self.chatwindow, image=self.sendbi, width=5, command=MemorySync.MemoryStorageUpdater)
+        self.send = ttk.Button(self.chatwindow, image=self.sendbi, width=5,
+                               command=lambda: Networking.SendNetworkTest(Networking))
         self.previousmessages = ttk.Label()
         self.windowtext = ''
 
-        self.updateipsetb = ttk.Button(self.advanced_frame, text="Update ipset", command=Networking.IPSetinit)
+        self.updateipsetb = ttk.Button(self.advanced_frame, text='Update Host IP')
         self.debugbtn = ttk.Button(self.advanced_frame, text="Debug info")
         self.clearhst = ttk.Button(self.advanced_frame, text='Clear local chat history',
                                    command=MemorySync.MemoryForgor)
@@ -61,6 +62,11 @@ class UI():
 
     def FirstInit(self, windo):
         pass
+
+    def MemoryBridge(self):
+        from MemorySync import MemorySync
+        Bridge = MemorySync()
+        Bridge.MemoryStorageUpdater()
 
 
     def MenuInit(self):

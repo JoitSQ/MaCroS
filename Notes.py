@@ -1,4 +1,20 @@
 '''
+
+H.O.S.T System:
+
+Hyper
+Operable
+Server
+Tree
+
+The messages shall be stored in a server device, usually a rusty laptop, along with IP sets of senders and receivers
+It will act as a transmitter as well as a storage to our messenger, leaving all the P2P hustle behind
+This isn't necessarily important for you, but I will document it here regardless
+But basically, the entirety of MaCroS will revolve around a specific server (testing on my laptop in a Radmin network)
+That means users can have their OWN servers!! This comes with risks, but we WILL encrypt the messages before we go public
+(I'm not sure if you'll stick after that though)
+
+
 Pallete to test
 
 Background:   '#dbeaff'
