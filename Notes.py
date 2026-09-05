@@ -45,4 +45,10 @@ d- delayed
 s - scrapped
 
 
+
+
+
+MAKE CONTACTS WITH IPS AS NAMES INTERNALLY
+ELABORATE FURTHER ONCE FULL (im going to eat)
+
 '''

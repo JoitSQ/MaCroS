@@ -1,16 +1,15 @@
 import socket
-
-from MemorySync import MemorySync
-from UInit import UI
 from tkinter import messagebox
 
 
 class Networking:
-    def __init__(self):
+    def __init__(self, ui, memory):
         # as proven, __init__ doesn't do shit :sob:
         self.PORT = 55485
         self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
         self.target_host = ''
+        self.ui = ui
+        self.memory = memory
 
     # Deprecated function, I now invented a H.O.S.T. system
     #         |             This now means that we have THE SERVERRR!!!! My laptop will pose as such with it being
@@ -28,20 +27,24 @@ class Networking:
                 self.HOST += i
 
     def SendNetworkTest(self):
-        self.PORT = 55485
+        self.rectmpl = b'Received'
+        self.PORT = 55483
         self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
         self.target_host = ''
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((self.HOST, self.PORT))
-            s.sendall(bytes(UI.message.get(), 'utf-8'))
-            data = s.recv(1024)
-            if data == 'Received':
-                pass
-            else:
-                messagebox.showerror('Error!', 'Failed to send message! Server unreachable')
-
+        if self.ui.message.get() != '':
+            with (socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s):
+                s.connect((self.HOST, self.PORT))
+                s.send(bytes(self.ui.message.get(), 'utf-8'))
+                data = s.recv(1024)
+                if data == self.rectmpl:
+                    pass
+                elif data == b'':
+                    self.SendNetworkTest()
+                else:
+                    messagebox.showerror('Error!', 'Failed to send message! Server unreachable')
+        self.memory.MemoryStorageUpdater()
     def ReceiveNetworkTest(self):
-        self.PORT = 55485
+        self.PORT = 55483
         self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
         self.target_host = ''
         while True:
@@ -50,8 +53,7 @@ class Networking:
                 s.listen()
                 conn, addr = s.accept()
                 with conn:
-                    print('Connected by', addr)
                     data = conn.recv(1024)
-                    MemorySync.MemoryReceiver(data)
+                    self.memory.MemoryReceiver(data)
                     fuckass = b'Received'
-                    conn.sendall(fuckass)
+                    conn.send(fuckass)
