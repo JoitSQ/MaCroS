@@ -21,7 +21,7 @@ class UI:
         self.window = windo
         windo.title('MaCroS A0.5.3')
 
-        self.chat=['26.0.2.167']
+        self.chat=['localhost']
         self.chatlabel=['Saved messages']
         self.chatid=0
         self.nickname = 'Sojaͳ'
@@ -169,6 +169,7 @@ class UI:
                 padx=10,
                 pady=3
             )
+
     def UpdateNickname(self):
         self.nickname = self.nicknameentry.get() + 'ͳ'
 
@@ -320,5 +321,7 @@ class UI:
             self.ButtonCreate(self.Net.sender, self.memory.sendername)
             self.chat.append(self.Net.sender)
             self.chatlabel.append(self.memory.sendername)
+            self.OpenChat(self.Net.sender)
+            self.UpdateChatlist()
             self.Net.receivedmsg=0
         self.window.after(100, self.UpdateChatListIncoming)

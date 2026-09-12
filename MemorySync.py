@@ -13,6 +13,7 @@ class MemorySync:
         self.ui = ui
 
     def IDDater(self):
+        self.MemoryStorageUpdater()
         self.messages = []
 
         history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
@@ -48,19 +49,19 @@ class MemorySync:
         history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'w')
         history.close()
 
-    def MemoryReceiver(self, rmssg):
+    def MemoryReceiver(self, rmssg, sender):
         rmssg = rmssg.decode('utf-8')
         self.sendername, rmssg = rmssg.split('ͳ')
         if rmssg != '':
             self.ui.inshadowtext = 123123
             self.inmsgindex += 1
-            history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
+            history = open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
             history.write(rmssg + f'⁝{self.inmsgindex}⁝{time.time()}⁝in' + '\n')
             history.close()
         elif rmssg == '':
             pass
         self.messages = []
-        history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
+        history = open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'r', encoding='utf-8')
         for line in history:
             message = line.rstrip('\n').split('⁝')
             message[2] = float(message[2])

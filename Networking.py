@@ -7,8 +7,8 @@ class Networking:
         self.sender=''
         self.receivedmsg=0
         # as proven, __init__ doesn't do shit :sob:
-        self.PORT = 55485
-        self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
+        self.PORT = 1
+        self.HOST = 'localhost'
         self.target_host = ''
         self.ui = ui
         self.memory = memory
@@ -30,14 +30,12 @@ class Networking:
 
     def SendNetworkTest(self):
         self.rectmpl = b'Received'
-        self.PORT = 55483
+        self.PORT = 1
         self.HOST = self.ui.chat[self.ui.chatid]
-        self.target_host = ''
         if self.ui.message.get() != '':
             with (socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s):
                 s.connect((self.HOST, self.PORT))
-                s.send(bytes(self.ui.nickname, 'utf-8'))
-                s.send(bytes(self.ui.message.get(), 'utf-8'))
+                s.send(bytes(self.ui.nickname, 'utf-8') +bytes(self.ui.message.get(), 'utf-8'))
                 data = s.recv(1024)
                 if data == self.rectmpl:
                     pass
@@ -47,9 +45,8 @@ class Networking:
                     messagebox.showerror('Error!', 'Failed to send message! Server unreachable')
         self.memory.MemoryStorageUpdater()
     def ReceiveNetworkTest(self):
-        self.PORT = 55483
-        self.HOST = '26.0.2.167'  # Fill out according to the H.O.S.T system
-        self.target_host = ''
+        self.PORT = 1
+        self.HOST = '0.0.0.0'
         while True:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.bind((self.HOST, self.PORT))
@@ -60,6 +57,6 @@ class Networking:
                     self.sender=addr[0]
                     if self.sender not in self.ui.chat:
                         self.receivedmsg=1
-                    self.memory.MemoryReceiver(data)
+                    self.memory.MemoryReceiver(data, self.sender)
                     fuckass = b'Received'
                     conn.send(fuckass)
