@@ -146,7 +146,6 @@ class UI:
         self.nicknameupdate.pack()
         self.inshadowtext = ''
 
-
     def NewMessage(self, msg, dir):
         message = ttk.Label(
             self.chatF,
@@ -241,8 +240,6 @@ class UI:
                 self.chatlabel.append(i)
             if 'Ϡ' in i:
                 c=1
-
-
 
     def MenuInit(self):
         # Initializing the closing menu button

@@ -50,6 +50,11 @@ class MemorySync:
         history.close()
 
     def MemoryReceiver(self, rmssg, sender):
+        if Path(rf"C:\MaCroS\P2PT\H-C\{sender}").exists():
+            pass
+        else:
+            Path.mkdir(rf"C:\MaCroS\P2PT\H-C\{sender}")
+            open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
         rmssg = rmssg.decode('utf-8')
         self.sendername, rmssg = rmssg.split('ͳ')
         if rmssg != '':
