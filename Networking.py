@@ -4,6 +4,8 @@ from tkinter import messagebox
 
 class Networking:
     def __init__(self, ui, memory):
+        self.sender=''
+        self.receivedmsg=0
         # as proven, __init__ doesn't do shit :sob:
         self.PORT = 55485
         self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
@@ -29,11 +31,12 @@ class Networking:
     def SendNetworkTest(self):
         self.rectmpl = b'Received'
         self.PORT = 55483
-        self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
+        self.HOST = self.ui.chat[self.ui.chatid]
         self.target_host = ''
         if self.ui.message.get() != '':
             with (socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s):
                 s.connect((self.HOST, self.PORT))
+                s.send(bytes(self.ui.nickname, 'utf-8'))
                 s.send(bytes(self.ui.message.get(), 'utf-8'))
                 data = s.recv(1024)
                 if data == self.rectmpl:
@@ -45,7 +48,7 @@ class Networking:
         self.memory.MemoryStorageUpdater()
     def ReceiveNetworkTest(self):
         self.PORT = 55483
-        self.HOST = 'localhost'  # Fill out according to the H.O.S.T system
+        self.HOST = '26.0.2.167'  # Fill out according to the H.O.S.T system
         self.target_host = ''
         while True:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -54,6 +57,9 @@ class Networking:
                 conn, addr = s.accept()
                 with conn:
                     data = conn.recv(1024)
+                    self.sender=addr[0]
+                    if self.sender not in self.ui.chat:
+                        self.receivedmsg=1
                     self.memory.MemoryReceiver(data)
                     fuckass = b'Received'
                     conn.send(fuckass)

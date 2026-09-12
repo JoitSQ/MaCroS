@@ -1,5 +1,5 @@
 import time
-
+from pathlib import Path
 import tkinter
 
 
@@ -14,36 +14,35 @@ class MemorySync:
 
     def IDDater(self):
         self.messages = []
-        history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'r', encoding='utf-8')
+
+        history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
+
         for line in history:
             message = line.rstrip('\n').split('⁝')
             message[2] = float(message[2])
             self.messages.append(message)
+
         self.messages.sort(key=lambda x: float(x[2]))
+
         history.close()
-
-    def MemoryStorageDaterIn(self):
-        self.inmsgindex += 1
-
-    def MemoryStorageDater(self):
-        self.msgindex += 1
 
     def MemoryStorageUpdater(self):
-        self.ui.windowtext = ''
+        if Path(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}").exists():
+            pass
+        else:
+            Path.mkdir(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}")
+            open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
         self.messageinput = self.ui.message.get()
         if self.messageinput != '':
-            history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'a', encoding='utf-8')
+            history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
             history.write(self.messageinput + f'⁝{self.msgindex}⁝{time.time()}⁝out' + '\n')
             history.close()
+
             self.ui.message.delete('0', tkinter.END)
-        self.messages = []
-        history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'r', encoding='utf-8')
-        for line in history:
-            message = line.rstrip('\n').split('⁝')
-            message[2] = float(message[2])
-            self.messages.append(message)
-        self.messages.sort(key=lambda x: float(x[2]))
-        history.close()
+
+            self.msgindex += 1
+            self.ui.changed = True
+            self.IDDater()
 
     def MemoryForgor(self):
         history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'w')
@@ -51,19 +50,21 @@ class MemorySync:
 
     def MemoryReceiver(self, rmssg):
         rmssg = rmssg.decode('utf-8')
+        self.sendername, rmssg = rmssg.split('ͳ')
         if rmssg != '':
             self.ui.inshadowtext = 123123
             self.inmsgindex += 1
-            history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'a', encoding='utf-8')
-            history.write(rmssg + f'⁝{self.msgindex}⁝{time.time()}⁝in' + '\n')
+            history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
+            history.write(rmssg + f'⁝{self.inmsgindex}⁝{time.time()}⁝in' + '\n')
             history.close()
         elif rmssg == '':
             pass
         self.messages = []
-        history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'r', encoding='utf-8')
+        history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
         for line in history:
             message = line.rstrip('\n').split('⁝')
             message[2] = float(message[2])
             self.messages.append(message)
         self.messages.sort(key=lambda x: float(x[2]))
         history.close()
+        self.ui.changed=True

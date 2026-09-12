@@ -4,84 +4,243 @@ from functools import partial
 from tkinter import PhotoImage
 # from tkinter import messagebox
 import tkinter as win
+from pathlib import Path
 from tkinter import ttk
-
+from tkinter import messagebox
 
 class UI:
 
     def __init__(self, windo):
         from MemorySync import MemorySync
         from Networking import Networking
-        windo.geometry('800x800')
+
         self.memory = MemorySync(self)
-        self.Networking = Networking(self, self.memory)
+        self.Net = Networking(self, self.memory)
+
+        windo.geometry('800x800')
         self.window = windo
-        windo.title('messenger duh')
+        windo.title('MaCroS A0.5.3')
+
+        self.chat=['26.0.2.167']
+        self.chatlabel=['Saved messages']
+        self.chatid=0
+        self.nickname = 'Sojaͳ'
+        self.changed=False
 
         self.backg = win.Frame(windo, bg="#dfefff")
-
-        # self.text = win.Label(self.backg, bg="#dfefff", text='initializing')
-        # self.error = win.Label(self.backg, bg="#dfefff")
-        # self.text.pack(anchor='center', expand=True)
-        # self.error.pack(anchor='center', expand=True)
         self.backg.pack(fill="both", expand=True)
 
-        self.glass = win.Frame(self.backg, bg="#f8fbff", bd=1, relief="solid")
-        self.sidebar = win.Frame(self.glass, bg='#dbeaff')
-
-        self.bFrame1 = win.Frame(self.glass)
-
-        # Further first stage selfow management
-        self.sendbi = PhotoImage(file=r'Images/sendbutton.png')
-        # Loading some variables for ts to be alive
-        self.popupmenu = win.Frame(self.glass, bg="#f8fbff")
-        self.advanced_frame = win.Frame(self.glass, bg="#f8fbff")
-
-        self.sidebar = win.Frame(self.glass, bg='#dbeaff')
-        self.popupmenub = ttk.Button(self.sidebar, text="Menu", command=self.popup, width=6)
-        # chat1=ttk.Button(sidebar, text=contact[0])
-        self.chatselfow = win.Frame(self.glass, bg="#f8fbff")
         style = ttk.Style()
         style.configure("Chat.TLabel", background='#f8fbff')
+
+        self.sendbi = PhotoImage(file=r'Images/sendbutton.png')
+
+        self.glass = win.Frame(self.backg, bg="#f8fbff", bd=1, relief="solid")
+        self.sidebar = win.Frame(self.glass, bg='#dbeaff', relief='solid')
+        self.sidebartop=win.Frame(self.sidebar, bg='#dbeaff')
+        self.sidebarchats=win.Frame(self.sidebar, bg='#dbeaff')
+        self.sidebarbottom = win.Frame(self.sidebar, bg='#dbeaff')
+        self.topsidebardivider = win.Frame(self.sidebartop, height=2, bg='#888888')
+        self.bottomsidebardivider = win.Frame(self.sidebarbottom, height=2, bg='#888888')
+        self.popupmenu = win.Frame(self.glass, bg="#f8fbff")
+        self.advanced_frame = win.Frame(self.glass, bg="#f8fbff")
+        self.chatselfow = win.Frame(self.glass, bg="#f8fbff")
         self.chatwindow = win.Frame(self.glass, bg="#f8fbff")
-        self.message = ttk.Entry(self.chatwindow, width=200)
-        self.send = ttk.Button(self.chatwindow,
+        self.bottombar = win.Frame(self.chatwindow, bg="#f8fbff")
+
+        self.chatcanvas = win.Canvas(self.chatwindow, bg="#f8fbff", highlightthickness=0)
+
+        self.chatscroller = ttk.Scrollbar(self.chatwindow, orient='vertical', command=self.chatcanvas.yview)
+
+        self.chatF = win.Frame(self.chatcanvas, bg="#f8fbff")
+
+        self.chatcanvas.configure(yscrollcommand=self.chatscroller.set)
+
+        self.message = ttk.Entry(self.bottombar, width=20)
+
+        self.popupmenub = ttk.Button(self.chatselfow, text="Menu", command=self.popup, width=6)
+        self.send = ttk.Button(self.bottombar,
                                image=self.sendbi,
                                width=5,
-                               command=self.Networking.SendNetworkTest)
-        self.row = ttk.Frame(self.chatwindow)
-        self.previousmessagesout = ttk.Label(self.row, style="Chat.TLabel")
-        self.windowtext = ''
+                               command=self.Net.SendNetworkTest)
 
-        self.previousmessagesin = ttk.Label(self.row, style="Chat.TLabel")
-        self.inwindowtext = ''
+        self.addchatip=ttk.Entry(self.sidebartop, width=50)
+        self.addchatname=ttk.Entry(self.sidebartop, width=50)
+        self.nicknameentry = ttk.Entry(self.sidebarbottom, width=50)
 
-        self.row.columnconfigure(0, weight=1)
-        self.row.columnconfigure(1, weight=1)
-
-        self.previousmessagesout.grid(row=0, column=1, sticky='e')
-        self.previousmessagesin.grid(row=0, column=0, sticky='w')
-        self.send.grid(row=1, column=0, sticky='s')
-        # self.send.grid(row=1, column=1, sticky='s')
+        self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:')
+        self.chatnamehint = ttk.Label(self.sidebartop, text='Chat name:')
+        self.addchat=ttk.Button(self.sidebartop, text='Add chat', command=self.CreateChat)
+        self.nicknameupdate = ttk.Button(self.sidebarbottom, text='Update nickname', command=self.UpdateNickname)
         self.close = ttk.Button(self.popupmenu, text='✕', command=self.popupdestroy, width=3)
-
         self.updateipsetb = ttk.Button(self.advanced_frame, text='Update Host IP')
         self.debugbtn = ttk.Button(self.advanced_frame, text="Debug info")
-        self.clearhst = ttk.Button(self.advanced_frame, text='Clear local chat history',
-                                   command=self.memory.MemoryForgor)
-        self.sidebar.pack(side='left', anchor='ne', expand=True, pady=5)
-        self.send.pack(side='left', anchor='sw', expand=False)
-        self.message.pack(side='bottom', anchor='sw', pady=5, padx=10)
-        self.chatwindow.pack(side='bottom', anchor='se', expand=True)
-        self.popupmenub.pack(side='top', anchor='nw', expand=True)
+        self.clearhst = ttk.Button(self.advanced_frame, text='Clear local chat history', command=self.memory.MemoryForgor)
+
+
+
+
+        self.sidebartop.pack(side='top', fill='y', pady=5)
+
+        self.chatiphint.pack(anchor='nw', padx=5)
+        self.addchatip.pack(padx=5)
+        self.chatnamehint.pack(anchor='nw', padx=5)
+        self.addchatname.pack(padx=5)
+        self.addchat.pack(anchor='nw', padx=5)
+        self.topsidebardivider.pack(fill='x', padx=5, pady=5)
+
+        self.sidebarchats.pack(side='top', fill='both', expand=True)
+
+        self.bottomsidebardivider.pack(fill='x', padx=5, pady=5)
+        self.sidebarbottom.pack(side='bottom', fill='x')
+        self.sidebar.pack(side='left', fill='y', pady=5)
+
+        self.chatwindow.pack(side='right', fill='both', expand=True, pady=5)
+
+        # Bottom input bar
+        self.bottombar.pack(side='bottom', fill='x')
+
+        self.message.pack(side='left', fill='x', expand=True, padx=10, pady=5)
+
+        self.send.pack( side='right', padx=5, pady=5)
+
+        # Scrollbar
+        self.chatscroller.pack(
+            side='right',
+            fill='y'
+        )
+
+        # Canvas
+        self.chatcanvas.pack(
+            side='left',
+            fill='both',
+            expand=True
+        )
+
+        # Messages frame inside canvas
+        self.chatcanvas_window = self.chatcanvas.create_window(
+            (0, 0),
+            anchor='nw',
+            window=self.chatF
+        )
+
+        # Make the message frame as wide as the canvas
+        self.chatcanvas.bind(
+            "<Configure>",
+            lambda e: self.chatcanvas.itemconfigure(
+                self.chatcanvas_window,
+                width=e.width
+            )
+        )
+
+        # Update scrollbar region
+        self.chatF.bind(
+            "<Configure>",
+            lambda e: self.chatcanvas.configure(
+                scrollregion=self.chatcanvas.bbox("all")
+            )
+        )
+        self.chatselfow.pack()
         self.close.pack(side='right', padx=5, pady=5)
-        self.row.pack(fill='x')
+        self.nicknameentry.pack()
+        self.nicknameupdate.pack()
         self.inshadowtext = ''
-        # self.glass.pack(padx=30, pady=30, fill="both", expand=True)
 
 
-    def FirstInit(self, windo):
-        pass
+    def NewMessage(self, msg, dir):
+        message = ttk.Label(
+            self.chatF,
+            text=msg,
+            style="Chat.TLabel",
+            wraplength=500,
+            justify='left'
+        )
+
+        if dir == 'out':
+            message.pack(
+                anchor='e',
+                padx=10,
+                pady=3
+            )
+
+        elif dir == 'in':
+            message.pack(
+                anchor='w',
+                padx=10,
+                pady=3
+            )
+    def UpdateNickname(self):
+        self.nickname = self.nicknameentry.get() + 'ͳ'
+
+    def ButtonCreate(self, chat_id, chat_name):
+        button = ttk.Button(self.sidebarchats, text=chat_name, command=lambda: self.OpenChat(chat_id))
+        button.pack(fill="x", padx=5, pady=2)
+        return button
+
+    def UpdaterButtons(self):
+        for i in range(len(self.chat)):
+            self.ButtonCreate(self.chat[i], self.chatlabel[i])
+
+    def OpenChat(self, chatid):
+        for i in range(len(self.chat)):
+            if self.chat[i] == chatid:
+                self.chatid = i
+
+        chatpath = Path(
+            rf"C:\MaCroS\P2PT\H-C\{chatid}"
+        )
+
+        if not chatpath.exists():
+            chatpath.mkdir()
+            open(
+                chatpath / 'history-client.txt',
+                'a',
+                encoding='utf-8'
+            ).close()
+
+        self.memory.IDDater()
+
+        self.LoadMessages()
+
+    def CreateChat(self):
+        chatname=self.addchatname.get()
+        chatip=self.addchatip.get()
+        self.addchatip.delete('0', win.END)
+        self.addchatname.delete('0', win.END)
+        self.chat.append(chatip)
+        self.chatlabel.append(chatname)
+        self.ButtonCreate(chatip, chatname)
+        self.UpdateChatlist()
+
+    def UpdateChatlist(self):
+        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'w', encoding='utf-8')
+        for i in self.chat:
+            chatlist.write(i)
+            chatlist.write('\n')
+        chatlist.write('Ϡ')
+        chatlist.write('\n')
+        for i in self.chatlabel:
+            chatlist.write(i)
+            chatlist.write('\n')
+        chatlist.close()
+
+    def ReadChatList(self):
+        c=0
+        self.chat=[]
+        self.chatlabel=[]
+        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
+
+        chatlisttemp = chatlist.readlines()
+
+        for i in chatlisttemp:
+            i=i.rstrip('\n')
+            if c==0 and 'Ϡ' not in i:
+                self.chat.append(i)
+            elif c==1 and 'Ϡ' not in i:
+                self.chatlabel.append(i)
+            if 'Ϡ' in i:
+                c=1
+
 
 
     def MenuInit(self):
@@ -100,7 +259,6 @@ class UI:
         # Add items to the popup menu
         self.MenuInit()
         # Destroy the button to call the popup
-        self.send.pack_forget()
         self.message.pack_forget()
         self.chatwindow.pack_forget()
         self.sidebar.pack_forget()
@@ -113,35 +271,54 @@ class UI:
         self.popupmenu.pack_forget()
         self.sidebar.pack(side='left', anchor='nw', padx=5, pady=5, expand=True)
         self.chatwindow.pack(side='bottom', anchor='se', expand=True)
-        self.send.pack(side='left', anchor='sw', expand=False)
-        self.message.pack(side='bottom', anchor='sw', pady=5, padx=10)
         # Reloading popupmenu
         self.mainmenuinit()
 
     def mainmenuinit(self):
-        self.glass.pack(padx=30, pady=30, fill="both", expand=True)
-        self.sidebar.pack(side='left', anchor='ne', expand=True, pady=5)
-        self.memory.MemoryStorageUpdater()
-        self.send.pack(side='left', anchor='sw', expand=False)
-        self.message.pack(side='bottom', anchor='sw', pady=5, padx=10)
-        self.chatwindow.pack(side='bottom', anchor='se', expand=True)
-        self.popupmenub.pack(side='top', anchor='nw', expand=True)
+        self.glass.pack(
+            padx=30,
+            pady=30,
+            fill="both",
+            expand=True
+        )
+
+        self.sidebar.pack(
+            side='left',
+            fill='y',
+            pady=5
+        )
+
+        self.chatwindow.pack(
+            side='right',
+            fill='both',
+            expand=True,
+            pady=5
+        )
+
+    def LoadMessages(self):
+        # Remove currently displayed messages
+        for widget in self.chatF.winfo_children():
+            widget.destroy()
+
+        # Create every message
+        for message in self.memory.messages:
+            self.NewMessage(message[0], message[3])
+
+        # Scroll to bottom
+        self.chatcanvas.update_idletasks()
+        self.chatcanvas.yview_moveto(1)
 
     def UpdateIncomingMessages(self):
-        if self.inshadowtext != self.inwindowtext or self.memory.messageinput != '':
-            self.windowtext = ''
-            self.inwindowtext = ''
-            for i in self.memory.messages:
-                if i[3] == 'out':
-                    self.windowtext += i[0]
-                    self.windowtext += '\n'
-                    self.inwindowtext += '\n'
-                if i[3] == 'in':
-                    self.inwindowtext += i[0]
-                    self.inwindowtext += '\n'
-                    self.windowtext += '\n'
-            self.previousmessagesout.configure(text=self.windowtext)
-            self.previousmessagesin.configure(text=self.inwindowtext)
-            self.memory.messageinput = ''
-            self.inshadowtext = self.inwindowtext
+        if self.changed:
+            self.LoadMessages()
+            self.changed=False
         self.window.after(100, self.UpdateIncomingMessages)
+
+    def UpdateChatListIncoming(self):
+        if self.Net.receivedmsg==1:
+            messagebox.showinfo('Notification', 'New Message!')
+            self.ButtonCreate(self.Net.sender, self.memory.sendername)
+            self.chat.append(self.Net.sender)
+            self.chatlabel.append(self.memory.sendername)
+            self.Net.receivedmsg=0
+        self.window.after(100, self.UpdateChatListIncoming)

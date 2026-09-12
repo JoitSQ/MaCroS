@@ -1,5 +1,14 @@
 # Startup script - compile here
-open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'a', encoding='utf-8')
+chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
+if chatlist.readlines() == []:
+    chatlist.close()
+    chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'a', encoding='utf-8')
+    chatlist.write('26.0.2.167')
+    chatlist.write('\n')
+    chatlist.write('Ϡ')
+    chatlist.write('\n')
+    chatlist.write('Saved Messages')
+chatlist.close()
 
 # Imports
 
@@ -27,12 +36,14 @@ wind = win.Tk()
 
 ui = UI(wind)
 
+ui.UpdateChatListIncoming()
+ui.ReadChatList()
 ui.mainmenuinit()
 ui.memory.IDDater()
-ui.memory.MemoryStorageUpdater()
+ui.LoadMessages()
 ui.UpdateIncomingMessages()
-
-thread = threading.Thread(target=ui.Networking.ReceiveNetworkTest, daemon=True)
+ui.UpdaterButtons()
+thread = threading.Thread(target=ui.Net.ReceiveNetworkTest, daemon=True)
 thread.start()
 
 wind.mainloop()

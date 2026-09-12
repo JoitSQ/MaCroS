@@ -12,4 +12,4 @@ while True:
             print('Connected by', addr, ', sending to ', addr)
             data = conn.recv(1024)
             print(f'Recieved {data}')
-            conn.send(data)
+            conn.send(b'Received')
