@@ -21,38 +21,75 @@ class UI:
         self.window = windo
         windo.title('MaCroS A0.5.3')
 
+        self.THEbg = '#EDE8FF'
+        self.bgcol = '#dde0ff'
+        self.glasscol = '#c9cdff'
+        self.sbcol = '#dfd6ff'
+        self.sbbg = '#A99BDB'
+        #                                              ↓ Windows dependant ↓
+        #self.button = [background, text, border, light theme color, dark theme color]
+        self.button = ['#A3AAFF', '#000000','#A3A6CE', "#c9cdff", "#8f80c5"]
+
         self.chat=['localhost']
         self.chatlabel=['Saved messages']
         self.chatid=0
-        self.nickname = 'Sojaͳ'
+        self.nickname=''
+        with open(r'C:\MaCroS\P2PT\config.txt') as nick:
+            c=0
+            for i in nick.readlines():
+                if 'Í³' in i:
+                    self.nickname=i.rstrip('Í³') + 'ͳ'
+
+                else:
+                    self.nickname = 'NoNameͳ'
+                c+=1
         self.changed=False
 
-        self.backg = win.Frame(windo, bg="#dfefff")
+        self.backg = win.Frame(windo, bg=self.THEbg)
         self.backg.pack(fill="both", expand=True)
 
         style = ttk.Style()
-        style.configure("Chat.TLabel", background='#f8fbff')
+
+        style.theme_use("clam")
+
+        style.configure(
+            "UI.TButton",
+            background=self.button[0],
+            foreground=self.button[1],
+            bordercolor=self.button[2],
+            lightcolor=self.button[3],
+            darkcolor=self.button[4],
+            padding=5)
+        style.map("UI.TButton",background=[("active", self.button[0]),("pressed", self.button[0])],foreground=[("active", self.button[1])])
+        style.configure("Chat.TLabel", background=self.glasscol)
+        superstyle = ttk.Style()
+        superstyle.configure("Chat.Vertical.TScrollbar", background=self.sbcol, troughcolor=self.sbbg, arrowcolor=self.sbbg, lightcolor=self.glasscol, darkcolor=self.glasscol)
 
         self.sendbi = PhotoImage(file=r'Images/sendbutton.png')
 
-        self.glass = win.Frame(self.backg, bg="#f8fbff", bd=1, relief="solid")
-        self.sidebar = win.Frame(self.glass, bg='#dbeaff', relief='solid')
-        self.sidebartop=win.Frame(self.sidebar, bg='#dbeaff')
-        self.sidebarchats=win.Frame(self.sidebar, bg='#dbeaff')
-        self.sidebarbottom = win.Frame(self.sidebar, bg='#dbeaff')
+        self.glass = win.Frame(self.backg, bg=self.glasscol, bd=1, relief="solid")
+        self.sidebar = win.Frame(self.glass, bg=self.bgcol, relief='solid')
+        self.sidebartop=win.Frame(self.sidebar, bg=self.bgcol)
+        self.sidebarchats=win.Frame(self.sidebar, bg=self.bgcol)
+        self.sidebarbottom = win.Frame(self.sidebar, bg=self.bgcol)
+
         self.topsidebardivider = win.Frame(self.sidebartop, height=2, bg='#888888')
         self.bottomsidebardivider = win.Frame(self.sidebarbottom, height=2, bg='#888888')
+        self.sidebardivier = win.Frame(self.glass, width=2, bg="#888888")
+
+        # So far unused
         self.popupmenu = win.Frame(self.glass, bg="#f8fbff")
         self.advanced_frame = win.Frame(self.glass, bg="#f8fbff")
-        self.chatselfow = win.Frame(self.glass, bg="#f8fbff")
-        self.chatwindow = win.Frame(self.glass, bg="#f8fbff")
-        self.bottombar = win.Frame(self.chatwindow, bg="#f8fbff")
 
-        self.chatcanvas = win.Canvas(self.chatwindow, bg="#f8fbff", highlightthickness=0)
+        self.chatselfow = win.Frame(self.glass, bg=self.glasscol)
+        self.chatwindow = win.Frame(self.glass, bg=self.glasscol)
+        self.bottombar = win.Frame(self.chatwindow, bg=self.glasscol)
 
-        self.chatscroller = ttk.Scrollbar(self.chatwindow, orient='vertical', command=self.chatcanvas.yview)
+        self.chatcanvas = win.Canvas(self.chatwindow, bg=self.glasscol, highlightthickness=0)
 
-        self.chatF = win.Frame(self.chatcanvas, bg="#f8fbff")
+        self.chatscroller = ttk.Scrollbar(self.chatwindow, orient='vertical', style="Chat.Vertical.TScrollbar", command=self.chatcanvas.yview)
+
+        self.chatF = win.Frame(self.chatcanvas, bg=self.glasscol)
 
         self.chatcanvas.configure(yscrollcommand=self.chatscroller.set)
 
@@ -61,15 +98,16 @@ class UI:
         self.popupmenub = ttk.Button(self.chatselfow, text="Menu", command=self.popup, width=6)
         self.send = ttk.Button(self.bottombar,
                                image=self.sendbi,
-                               width=5,
+                               width=3,
                                command=self.Net.SendNetworkTest)
 
-        self.addchatip=ttk.Entry(self.sidebartop, width=50)
-        self.addchatname=ttk.Entry(self.sidebartop, width=50)
-        self.nicknameentry = ttk.Entry(self.sidebarbottom, width=50)
+        self.addchatip=ttk.Entry(self.sidebartop, width=25)
+        self.addchatname=ttk.Entry(self.sidebartop, width=25)
+        self.nicknameentry = ttk.Entry(self.sidebarbottom, width=25)
 
-        self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:')
-        self.chatnamehint = ttk.Label(self.sidebartop, text='Chat name:')
+        self.nicknamedisplay = ttk.Label(self.sidebarbottom, text=self.nickname.rstrip('ͳ'), background=self.bgcol)
+        self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:', background=self.bgcol)
+        self.chatnamehint = ttk.Label(self.sidebartop, text='Chat name:', background=self.bgcol)
         self.addchat=ttk.Button(self.sidebartop, text='Add chat', command=self.CreateChat)
         self.nicknameupdate = ttk.Button(self.sidebarbottom, text='Update nickname', command=self.UpdateNickname)
         self.close = ttk.Button(self.popupmenu, text='✕', command=self.popupdestroy, width=3)
@@ -83,17 +121,19 @@ class UI:
         self.sidebartop.pack(side='top', fill='y', pady=5)
 
         self.chatiphint.pack(anchor='nw', padx=5)
-        self.addchatip.pack(padx=5)
+        self.addchatip.pack(padx=5, pady=1)
         self.chatnamehint.pack(anchor='nw', padx=5)
         self.addchatname.pack(padx=5)
-        self.addchat.pack(anchor='nw', padx=5)
+        self.addchat.pack(anchor='nw', padx=5, pady=5)
         self.topsidebardivider.pack(fill='x', padx=5, pady=5)
 
         self.sidebarchats.pack(side='top', fill='both', expand=True)
 
         self.bottomsidebardivider.pack(fill='x', padx=5, pady=5)
+        self.nicknamedisplay.pack(pady=5)
         self.sidebarbottom.pack(side='bottom', fill='x')
-        self.sidebar.pack(side='left', fill='y', pady=5)
+        self.sidebar.pack(side='left', fill='y')
+        self.sidebardivier.pack(side='left', fill='y')
 
         self.chatwindow.pack(side='right', fill='both', expand=True, pady=5)
 
@@ -105,42 +145,19 @@ class UI:
         self.send.pack( side='right', padx=5, pady=5)
 
         # Scrollbar
-        self.chatscroller.pack(
-            side='right',
-            fill='y'
-        )
+        self.chatscroller.pack(side='right', fill='y')
 
         # Canvas
-        self.chatcanvas.pack(
-            side='left',
-            fill='both',
-            expand=True
-        )
+        self.chatcanvas.pack(side='left', fill='both', expand=True)
 
         # Messages frame inside canvas
-        self.chatcanvas_window = self.chatcanvas.create_window(
-            (0, 0),
-            anchor='nw',
-            window=self.chatF
-        )
+        self.chatcanvas_window = self.chatcanvas.create_window((0, 0), anchor='nw', window=self.chatF)
 
         # Make the message frame as wide as the canvas
-        self.chatcanvas.bind(
-            "<Configure>",
-            lambda e: self.chatcanvas.itemconfigure(
-                self.chatcanvas_window,
-                width=e.width
-            )
-        )
+        self.chatcanvas.bind("<Configure>",lambda e: self.chatcanvas.itemconfigure(self.chatcanvas_window,width=e.width))
 
         # Update scrollbar region
-        self.chatF.bind(
-            "<Configure>",
-            lambda e: self.chatcanvas.configure(
-                scrollregion=self.chatcanvas.bbox("all")
-            )
-        )
-        self.chatselfow.pack()
+        self.chatF.bind("<Configure>",lambda e: self.chatcanvas.configure(scrollregion=self.chatcanvas.bbox("all")) )
         self.close.pack(side='right', padx=5, pady=5)
         self.nicknameentry.pack()
         self.nicknameupdate.pack()
@@ -171,6 +188,22 @@ class UI:
 
     def UpdateNickname(self):
         self.nickname = self.nicknameentry.get() + 'ͳ'
+        self.nicknamedisplay.configure(text=self.nicknameentry.get())
+        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'w', encoding='utf-8')
+        for i in self.chat:
+            chatlist.write(i)
+            chatlist.write('\n')
+        chatlist.write('Ϡ')
+        chatlist.write('\n')
+        for i in self.chatlabel:
+            chatlist.write(i)
+            chatlist.write('\n')
+        chatlist.write('Ϡ')
+        chatlist.write('\n')
+        chatlist.write(self.nickname)
+        chatlist.close()
+        self.nicknameentry.delete(0, win.END)
+
 
     def ButtonCreate(self, chat_id, chat_name):
         button = ttk.Button(self.sidebarchats, text=chat_name, command=lambda: self.OpenChat(chat_id))
@@ -238,8 +271,10 @@ class UI:
                 self.chat.append(i)
             elif c==1 and 'Ϡ' not in i:
                 self.chatlabel.append(i)
+            elif c==2 and 'Ϡ' not in i:
+                self.nickname=i
             if 'Ϡ' in i:
-                c=1
+                c+=1
 
     def MenuInit(self):
         # Initializing the closing menu button
@@ -283,7 +318,6 @@ class UI:
         self.sidebar.pack(
             side='left',
             fill='y',
-            pady=5
         )
 
         self.chatwindow.pack(

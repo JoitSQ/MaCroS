@@ -47,10 +47,10 @@ class Networking:
     def ReceiveNetworkTest(self):
         self.PORT = 1
         self.HOST = '0.0.0.0'
-        while True:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind((self.HOST, self.PORT))
-                s.listen()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((self.HOST, self.PORT))
+            s.listen()
+            while True:
                 conn, addr = s.accept()
                 with conn:
                     data = conn.recv(1024)
