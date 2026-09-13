@@ -1,8 +1,29 @@
-# MaCroS-Code
-Please do not interfere until first version is released
-This project consists of unfinished code and ideas. Please let me work through them first before interfering. Thank you.
 
-----------------------------------------------
+# How to setup your MaCroS correctly - Build 0.6.3
+I will make a script to automate it in the next release  ;-; 
+--------------------------------------------
+First, head to C:\
+Create folder named MaCroS
+
+Inside it, create another folder, labeled P2PT,
+
+Inside it, create:
+
+A folder named H-C,
+and config.txt file
+
+The whole path should look like:
+
+C:\MaCroS\P2PT\H-C,
+
+and C:\MaCroS\P2PT\config.txt.
+
+To actually use the program outside your home network, I recomend using a LAN manager, like Radmin VPN or LogMeIn Hamachi. To send a message, simply add a chat with your friend's IP adress in said LAN manager.
+
+You're good to go! Just launch the .exe file attached and start typing!
+
+-----------------------------------------------
+# MaCroS-Code
 MaCroS is completely free messenger alternative, working on a P2P technology, which means it CAN NOT be blocked in any way without cutting your whole internet access. 
 
 With Telegram's blockage it is as important as ever to be able to keep in touch with your relatives, family and friends. MaCroS will help with that!
