@@ -7,6 +7,8 @@ import tkinter as win
 from pathlib import Path
 from tkinter import ttk
 from tkinter import messagebox
+import sys
+from pathlib import Path
 
 class UI:
 
@@ -65,7 +67,7 @@ class UI:
         superstyle = ttk.Style()
         superstyle.configure("Chat.Vertical.TScrollbar", background=self.sbcol, troughcolor=self.sbbg, arrowcolor=self.sbbg, lightcolor=self.glasscol, darkcolor=self.glasscol)
 
-        self.sendbi = PhotoImage(file=r'Images/sendbutton.png')
+        self.sendbi = PhotoImage(file=str(rf"{self.resource_path('Images/sendbutton.png')}"))
 
         self.glass = win.Frame(self.backg, bg=self.glasscol, bd=1, relief="solid")
         self.sidebar = win.Frame(self.glass, bg=self.bgcol, relief='solid')
@@ -185,6 +187,13 @@ class UI:
                 padx=10,
                 pady=3
             )
+
+    def resource_path(self, relative_path):
+        if getattr(sys, 'frozen', False):
+            base_path = Path(sys._MEIPASS)
+        else:
+            base_path = Path(__file__).parent
+        return base_path / relative_path
 
     def UpdateNickname(self):
         self.nickname = self.nicknameentry.get() + 'ͳ'

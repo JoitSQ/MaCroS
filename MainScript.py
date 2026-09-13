@@ -1,4 +1,5 @@
 # Startup script - compile here
+# compile with: python -m PyInstaller --onedir --onefile --windowed --add-data "Images;Images" MainScript.py
 chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
 if chatlist.readlines() == []:
     chatlist.close()
