@@ -1,7 +1,7 @@
 import time
 from pathlib import Path
 import tkinter
-
+from winotify import Notification
 
 class MemorySync:
     msgindex = 0
@@ -60,6 +60,9 @@ class MemorySync:
         if rmssg == 'Onlineλ':
             return
         if rmssg != '':
+            if self.ui.trayed:
+                notif = Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.sendername}: {rmssg}')
+                notif.show()
             self.ui.inshadowtext = 123123
             self.inmsgindex += 1
             history = open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
