@@ -186,8 +186,8 @@ class UI:
 
 
     def MinimizeToTray(self):
-        self.window.withdraw()
         self.trayed=True
+        self.window.withdraw()
         image = Image.open("Images/icon.png")
 
         menu = pystray.Menu(
@@ -212,8 +212,6 @@ class UI:
     def Quit(self, icon, item):
         icon.stop()
         self.window.after(0, self.window.destroy)
-
-
 
     def NewMessage(self, msg, dir):
         message = ttk.Label(
@@ -407,13 +405,12 @@ class UI:
     def UpdateIncomingMessages(self):
         if self.changed:
             self.LoadMessages()
+
             self.changed=False
         self.window.after(100, self.UpdateIncomingMessages)
 
     def UpdateChatListIncoming(self):
         if self.Net.receivedmsg==1:
-            if self.trayed:
-                Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.memory.sendername} sent you a message!').show()
             self.ButtonCreate(self.Net.sender, self.memory.sendername)
             self.chat.append(self.Net.sender)
             self.chatlabel.append(self.memory.sendername)
@@ -427,11 +424,11 @@ class UI:
             self.onlined = True
         else:
             self.onlined=False
-        self.window.after(1000, self.UpdateOnline)
+        self.window.after(500, self.UpdateOnline)
 
     def UpdateOnlineUI(self):
         if self.onlined:
             self.IsOnlineText.configure(text='User online!', style='Online.TLabel')
         else:
             self.IsOnlineText.configure(text='User offline!', style='Offline.TLabel')
-        self.window.after(1000, self.UpdateOnlineUI)
+        self.window.after(500, self.UpdateOnlineUI)

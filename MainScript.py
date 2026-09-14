@@ -16,15 +16,17 @@ import sys
 
 if not Path.exists(r'C:\MaCroS'):
     Path.mkdir(structure)
-    Path.mkdir(rf'{structure}\P2PT')
-    Path.mkdir(rf'{structure}\P2PT\H-C')
-    open(rf'{structure}\P2PT\config.txt', 'a').close()
+    if not Path.exists(rf'{structure}\P2PT'):
+        Path.mkdir(rf'{structure}\P2PT')
+        if not Path.exists(rf'{structure}\P2PT\H-C'):
+            Path.mkdir(rf'{structure}\P2PT\H-C')
+            open(rf'{structure}\P2PT\config.txt', 'a').close()
 if Path.is_file(rf'{structure}\P2PT\config.txt'):
     chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
     if chatlist.readlines() == []:
         chatlist.close()
         chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'a', encoding='utf-8')
-        chatlist.write('26.0.2.167')
+        chatlist.write('localhost')
         chatlist.write('\n')
         chatlist.write('Ϡ')
         chatlist.write('\n')

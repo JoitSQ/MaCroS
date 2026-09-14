@@ -65,7 +65,7 @@ class Networking:
     def IsOnline(self, connector):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(.1)
+                s.settimeout(.2)
                 s.connect((connector, self.PORT))
                 s.send(bytes(self.ui.nickname, 'utf-8') +bytes('Onlineλ', 'utf-8'))
                 if s.recv(1024) == b'Received':
