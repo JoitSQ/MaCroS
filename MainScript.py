@@ -1,15 +1,6 @@
 # Startup script - compile here
 # compile with: python -m PyInstaller --onedir --onefile --windowed --add-data "Images;Images" MainScript.py
-chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
-if chatlist.readlines() == []:
-    chatlist.close()
-    chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'a', encoding='utf-8')
-    chatlist.write('26.0.2.167')
-    chatlist.write('\n')
-    chatlist.write('Ϡ')
-    chatlist.write('\n')
-    chatlist.write('Saved Messages')
-chatlist.close()
+structure = r'C:\MaCroS'
 
 # Imports
 
@@ -22,6 +13,24 @@ import socket
 from pathlib import Path
 import ctypes
 import sys
+
+if not Path.exists(r'C:\MaCroS'):
+    Path.mkdir(structure)
+    Path.mkdir(rf'{structure}\P2PT')
+    Path.mkdir(rf'{structure}\P2PT\H-C')
+    open(rf'{structure}\P2PT\config.txt', 'a').close()
+if Path.is_file(rf'{structure}\P2PT\config.txt'):
+    chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
+    if chatlist.readlines() == []:
+        chatlist.close()
+        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'a', encoding='utf-8')
+        chatlist.write('26.0.2.167')
+        chatlist.write('\n')
+        chatlist.write('Ϡ')
+        chatlist.write('\n')
+        chatlist.write('Saved Messages')
+    chatlist.close()
+
 
 # Class definition
 
@@ -37,6 +46,7 @@ wind = win.Tk()
 
 ui = UI(wind)
 
+
 ui.UpdateChatListIncoming()
 ui.ReadChatList()
 ui.mainmenuinit()
@@ -46,6 +56,10 @@ ui.UpdateIncomingMessages()
 ui.UpdaterButtons()
 thread = threading.Thread(target=ui.Net.ReceiveNetworkTest, daemon=True)
 thread.start()
+thread = threading.Thread(target=ui.UpdateOnline(), daemon=True)
+thread.start()
+ui.UpdateOnlineUI()
+#thread=threading.Thread(target=ui.MinimizeToTray())
 
 wind.mainloop()
 

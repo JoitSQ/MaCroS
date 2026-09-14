@@ -44,6 +44,7 @@ class Networking:
                 else:
                     messagebox.showerror('Error!', 'Failed to send message! Server unreachable')
         self.memory.MemoryStorageUpdater()
+
     def ReceiveNetworkTest(self):
         self.PORT = 1
         self.HOST = '0.0.0.0'
@@ -55,8 +56,19 @@ class Networking:
                 with conn:
                     data = conn.recv(1024)
                     self.sender=addr[0]
-                    if self.sender not in self.ui.chat:
+                    if self.sender not in self.ui.chat and "Onlineλ" not in data.decode('utf-8'):
                         self.receivedmsg=1
                     self.memory.MemoryReceiver(data, self.sender)
                     fuckass = b'Received'
                     conn.send(fuckass)
+
+    def IsOnline(self, connector):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(.1)
+                s.connect((connector, self.PORT))
+                s.send(bytes(self.ui.nickname, 'utf-8') +bytes('Onlineλ', 'utf-8'))
+                if s.recv(1024) == b'Received':
+                    return True
+        except (ConnectionRefusedError, TimeoutError, OSError):
+            return False

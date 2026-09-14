@@ -9,6 +9,10 @@ from tkinter import ttk
 from tkinter import messagebox
 import sys
 from pathlib import Path
+from winotify import Notification
+import pystray
+from PIL import Image
+
 
 class UI:
 
@@ -19,15 +23,23 @@ class UI:
         self.memory = MemorySync(self)
         self.Net = Networking(self, self.memory)
 
+        self.state = 'b'
+        self.vernumber = '0.6.4'
+        self.title = ('MaCroS ') + self.state + self.vernumber
+
         windo.geometry('800x800')
         self.window = windo
-        windo.title('MaCroS A0.5.3')
+        self.window.protocol("WM_DELETE_WINDOW", self.MinimizeToTray)
+        windo.title(self.title)
 
         self.THEbg = '#EDE8FF'
         self.bgcol = '#dde0ff'
         self.glasscol = '#c9cdff'
         self.sbcol = '#dfd6ff'
         self.sbbg = '#A99BDB'
+        self.green = '#009E00'
+        self.red = '#E80022'
+
         #                                              ↓ Windows dependant ↓
         #self.button = [background, text, border, light theme color, dark theme color]
         self.button = ['#A3AAFF', '#000000','#A3A6CE', "#c9cdff", "#8f80c5"]
@@ -36,15 +48,16 @@ class UI:
         self.chatlabel=['Saved messages']
         self.chatid=0
         self.nickname=''
+        self.onlined = False
+        self.trayed=False
+
         with open(r'C:\MaCroS\P2PT\config.txt') as nick:
-            c=0
             for i in nick.readlines():
                 if 'Í³' in i:
                     self.nickname=i.rstrip('Í³') + 'ͳ'
-
+                    break
                 else:
                     self.nickname = 'NoNameͳ'
-                c+=1
         self.changed=False
 
         self.backg = win.Frame(windo, bg=self.THEbg)
@@ -54,6 +67,8 @@ class UI:
 
         style.theme_use("clam")
 
+        style.configure('Online.TLabel', background=self.glasscol, foreground = self.green)
+        style.configure('Offline.TLabel', background=self.glasscol, foreground = self.red)
         style.configure(
             "UI.TButton",
             background=self.button[0],
@@ -107,6 +122,7 @@ class UI:
         self.addchatname=ttk.Entry(self.sidebartop, width=25)
         self.nicknameentry = ttk.Entry(self.sidebarbottom, width=25)
 
+        self.IsOnlineText = ttk.Label(self.bottombar, text='', background = self.glasscol, style='Online.TLabel')
         self.nicknamedisplay = ttk.Label(self.sidebarbottom, text=self.nickname.rstrip('ͳ'), background=self.bgcol)
         self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:', background=self.bgcol)
         self.chatnamehint = ttk.Label(self.sidebartop, text='Chat name:', background=self.bgcol)
@@ -142,6 +158,8 @@ class UI:
         # Bottom input bar
         self.bottombar.pack(side='bottom', fill='x')
 
+        self.IsOnlineText.pack(padx=5)
+
         self.message.pack(side='left', fill='x', expand=True, padx=10, pady=5)
 
         self.send.pack( side='right', padx=5, pady=5)
@@ -162,8 +180,40 @@ class UI:
         self.chatF.bind("<Configure>",lambda e: self.chatcanvas.configure(scrollregion=self.chatcanvas.bbox("all")) )
         self.close.pack(side='right', padx=5, pady=5)
         self.nicknameentry.pack()
-        self.nicknameupdate.pack()
+        self.nicknameupdate.pack(pady=5)
         self.inshadowtext = ''
+
+
+
+    def MinimizeToTray(self):
+        self.window.withdraw()
+        self.trayed=True
+        image = Image.open("Images/icon.png")
+
+        menu = pystray.Menu(
+            pystray.MenuItem("Open MaCroS", self.ShowWindow),
+            pystray.MenuItem("Quit", self.Quit)
+        )
+
+        self.tray_icon = pystray.Icon(
+            "MaCroS",
+            image,
+            "MaCroS",
+            menu
+        )
+
+        self.tray_icon.run()
+
+    def ShowWindow(self, icon, item):
+        icon.stop()
+        self.trayed=False
+        self.window.after(0, self.window.deiconify)
+
+    def Quit(self, icon, item):
+        icon.stop()
+        self.window.after(0, self.window.destroy)
+
+
 
     def NewMessage(self, msg, dir):
         message = ttk.Label(
@@ -213,9 +263,14 @@ class UI:
         chatlist.close()
         self.nicknameentry.delete(0, win.END)
 
+    def IsOnlineUI(self):
+        if self.Net.IsOnline(self.chat[self.chatid]):
+            return True
+        else:
+            return False
 
     def ButtonCreate(self, chat_id, chat_name):
-        button = ttk.Button(self.sidebarchats, text=chat_name, command=lambda: self.OpenChat(chat_id))
+        button = ttk.Button(self.sidebarchats, text=f'{chat_name}', command=lambda: self.OpenChat(chat_id))
         button.pack(fill="x", padx=5, pady=2)
         return button
 
@@ -357,7 +412,8 @@ class UI:
 
     def UpdateChatListIncoming(self):
         if self.Net.receivedmsg==1:
-            messagebox.showinfo('Notification', 'New Message!')
+            if self.trayed:
+                Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.memory.sendername} sent you a message!').show()
             self.ButtonCreate(self.Net.sender, self.memory.sendername)
             self.chat.append(self.Net.sender)
             self.chatlabel.append(self.memory.sendername)
@@ -365,3 +421,17 @@ class UI:
             self.UpdateChatlist()
             self.Net.receivedmsg=0
         self.window.after(100, self.UpdateChatListIncoming)
+
+    def UpdateOnline(self):
+        if self.IsOnlineUI():
+            self.onlined = True
+        else:
+            self.onlined=False
+        self.window.after(1000, self.UpdateOnline)
+
+    def UpdateOnlineUI(self):
+        if self.onlined:
+            self.IsOnlineText.configure(text='User online!', style='Online.TLabel')
+        else:
+            self.IsOnlineText.configure(text='User offline!', style='Offline.TLabel')
+        self.window.after(1000, self.UpdateOnlineUI)

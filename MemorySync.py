@@ -57,6 +57,8 @@ class MemorySync:
             open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
         rmssg = rmssg.decode('utf-8')
         self.sendername, rmssg = rmssg.split('ͳ')
+        if rmssg == 'Onlineλ':
+            return
         if rmssg != '':
             self.ui.inshadowtext = 123123
             self.inmsgindex += 1

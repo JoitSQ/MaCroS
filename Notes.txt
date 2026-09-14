@@ -26,13 +26,6 @@ That means users can have their OWN servers!! This comes with risks, but we WILL
 (I'm not sure if you'll stick after that though)
 
 
-Pallete to test
-
-Background:   '#dbeaff'
-Glass panel:  '#f7fbff'
-Border:       '#b9d1ff'
-Accent:       '#4aa3ff'
-
 'Near future' plans:
 
 1. Split the code into multiple files - D
