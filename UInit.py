@@ -84,6 +84,7 @@ class UI:
 
         self.sendbi = PhotoImage(file=str(rf"{self.resource_path('Images/sendbutton.png')}"))
 
+
         self.glass = win.Frame(self.backg, bg=self.glasscol, bd=1, relief="solid")
         self.sidebar = win.Frame(self.glass, bg=self.bgcol, relief='solid')
         self.sidebartop=win.Frame(self.sidebar, bg=self.bgcol)
@@ -188,7 +189,7 @@ class UI:
     def MinimizeToTray(self):
         self.trayed=True
         self.window.withdraw()
-        image = Image.open("Images/icon.png")
+        image = Image.open(str(rf"{self.resource_path('Images/icon.png')}"))
 
         menu = pystray.Menu(
             pystray.MenuItem("Open MaCroS", self.ShowWindow),
