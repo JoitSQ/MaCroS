@@ -1,11 +1,5 @@
 
-# How to setup your MaCroS correctly - Build 0.6.3
---------------------------------------------
-
-You're good to go! Just launch the .exe file attached and start typing!
-
------------------------------------------------
-# MaCroS-Code
+# MaCroS
 MaCroS is completely free messenger alternative, working on a P2P technology, which means it CAN NOT be blocked in any way without cutting your whole internet access. 
 
 With Telegram's blockage it is as important as ever to be able to keep in touch with your relatives, family and friends. MaCroS will help with that!
