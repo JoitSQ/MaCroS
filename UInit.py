@@ -426,7 +426,7 @@ class UI:
             self.onlined = True
         else:
             self.onlined=False
-        self.window.after(500, self.UpdateOnline)
+        self.window.after(300, self.UpdateOnline)
 
     def UpdateOnlineUI(self):
         if self.onlined:
