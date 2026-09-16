@@ -318,6 +318,7 @@ class UI:
         for i in self.chatlabel:
             chatlist.write(i)
             chatlist.write('\n')
+        chatlist.write(self.nickname)
         chatlist.close()
 
     def ReadChatList(self):
