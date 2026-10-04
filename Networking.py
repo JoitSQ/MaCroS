@@ -55,7 +55,7 @@ class Networking:
                 conn, addr = s.accept()
                 with conn:
                     data = conn.recv(1024)
-                    self.sender=addr[0]
+                    self.sender=addr[0] if self.HOST != addr[0] else 'localhost'
                     if self.sender not in self.ui.chat and "Onlineλ" not in data.decode('utf-8'):
                         self.receivedmsg=1
                     self.memory.MemoryReceiver(data, self.sender)

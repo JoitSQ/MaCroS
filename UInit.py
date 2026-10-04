@@ -298,6 +298,7 @@ class UI:
 
         self.LoadMessages()
 
+
     def CreateChat(self):
         chatname=self.addchatname.get()
         chatip=self.addchatip.get()
@@ -392,6 +393,8 @@ class UI:
         )
 
     def LoadMessages(self):
+
+        self.chatcanvas.yview_moveto(0)
         # Remove currently displayed messages
         for widget in self.chatF.winfo_children():
             widget.destroy()
@@ -402,6 +405,7 @@ class UI:
 
         # Scroll to bottom
         self.chatcanvas.update_idletasks()
+        self.chatcanvas.configure(scrollregion=self.chatcanvas.bbox("all"))
         self.chatcanvas.yview_moveto(1)
 
     def UpdateIncomingMessages(self):
