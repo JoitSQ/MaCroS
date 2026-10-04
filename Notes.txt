@@ -18,12 +18,29 @@ Operable
 Server
 Tree
 
-The messages shall be stored in a server device, usually a rusty laptop, along with IP sets of senders and receivers
-It will act as a transmitter as well as a storage to our messenger, leaving all the P2P hustle behind
-This isn't necessarily important for you, but I will document it here regardless
-But basically, the entirety of MaCroS will revolve around a specific server (testing on my laptop in a Radmin network)
-That means users can have their OWN servers!! This comes with risks, but we WILL encrypt the messages before we go public
+The messages shall be stored in a server device, usually a rusty laptop, along with IP sets of senders and receivers.
+It will act as a transmitter as well as a storage to our messenger, leaving all the P2P hustle behind.
+This isn't necessarily important for you, but I will document it here regardless.
+But basically, the entirety of MaCroS will revolve around a specific server (testing on my laptop in a Radmin network).
+That means users can have their OWN servers!! This comes with risks, but we WILL encrypt the messages before we go public.
 (I'm not sure if you'll stick after that though)
+
+
+
+AMR:
+
+Alternate
+Mount
+Relay
+
+
+Somewhere in the future, when the project is grown enough, a patch shall be released.
+A Relay that will leave Radmin and LAN connections behind as a technology for this program.
+It will be completely optional, as I will add a checkbox in settings (yet to come btw) to turn it on/off.
+
+WILL COMPLETELY DEPRECATE H.O.S.T. SYSTEM. PATCH 1.5 REQUIRED.
+
+
 
 
 'Near future' plans:
