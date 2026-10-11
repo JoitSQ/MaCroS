@@ -19,8 +19,10 @@ class UI:
     def __init__(self, windo):
         from MemorySync import MemorySync
         from Networking import Networking
+        from Security import Security
 
         self.memory = MemorySync(self)
+        self.security = Security(self)
         self.Net = Networking(self, self.memory)
 
         self.state = 'b'
@@ -44,7 +46,7 @@ class UI:
         #self.button = [background, text, border, light theme color, dark theme color]
         self.button = ['#A3AAFF', '#000000','#A3A6CE', "#c9cdff", "#8f80c5"]
 
-        self.chat=['localhost']
+        self.chat=['26.0.2.167']
         self.chatlabel=['Saved messages']
         self.chatid=0
         self.nickname=''
@@ -117,12 +119,13 @@ class UI:
         self.send = ttk.Button(self.bottombar,
                                image=self.sendbi,
                                width=3,
-                               command=self.Net.SendNetworkTest)
+                               command=self.Net.SendNetwork)
 
         self.addchatip=ttk.Entry(self.sidebartop, width=25)
         self.addchatname=ttk.Entry(self.sidebartop, width=25)
         self.nicknameentry = ttk.Entry(self.sidebarbottom, width=25)
 
+        self.securitywarn = ttk.Label(self.chatcanvas, text='Testing...', background=self.glasscol)
         self.IsOnlineText = ttk.Label(self.bottombar, text='', background = self.glasscol, style='Online.TLabel')
         self.nicknamedisplay = ttk.Label(self.sidebarbottom, text=self.nickname.rstrip('ͳ'), background=self.bgcol)
         self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:', background=self.bgcol)
@@ -165,6 +168,7 @@ class UI:
 
         self.send.pack( side='right', padx=5, pady=5)
 
+        self.securitywarn.pack(side='bottom', anchor='s', padx=5, pady=5)
         # Scrollbar
         self.chatscroller.pack(side='right', fill='y')
 
@@ -416,7 +420,7 @@ class UI:
         self.window.after(100, self.UpdateIncomingMessages)
 
     def UpdateChatListIncoming(self):
-        if self.Net.receivedmsg==1:
+        if self.Net.receivedmsg==1 and self.Net.sender not in self.chat:
             self.ButtonCreate(self.Net.sender, self.memory.sendername)
             self.chat.append(self.Net.sender)
             self.chatlabel.append(self.memory.sendername)
@@ -426,15 +430,21 @@ class UI:
         self.window.after(100, self.UpdateChatListIncoming)
 
     def UpdateOnline(self):
-        if self.IsOnlineUI():
+        check = self.Net.IsOnline(self.chat[self.chatid])
+        if check:
             self.onlined = True
-        else:
+        elif not check:
             self.onlined=False
+        else:
+            self.onlined = 'hide'
         self.window.after(300, self.UpdateOnline)
 
     def UpdateOnlineUI(self):
-        if self.onlined:
+        if self.chat[self.chatid]==self.Net.HOST:
+            self.IsOnlineText.configure(text='', style='Offline.TLabel')
+            self.securitywarn.configure(text='')
+        elif self.onlined:
             self.IsOnlineText.configure(text='User online!', style='Online.TLabel')
-        else:
+        elif not self.onlined:
             self.IsOnlineText.configure(text='User offline!', style='Offline.TLabel')
         self.window.after(500, self.UpdateOnlineUI)

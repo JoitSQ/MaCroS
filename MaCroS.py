@@ -1,5 +1,7 @@
-# Startup script - compile here
-# compile with: python -m PyInstaller --onedir --onefile --windowed --add-data "Images;Images" MainScript.py
+# Startup script - compile here with:
+# python -m PyInstaller --onedir --onefile --windowed --add-data "Images;Images" MaCroS.py
+
+
 structure = r'C:\MaCroS'
 
 # Imports
@@ -60,7 +62,8 @@ thread = threading.Thread(target=ui.Net.ReceiveNetworkTest, daemon=True)
 thread.start()
 thread = threading.Thread(target=ui.UpdateOnline(), daemon=True)
 thread.start()
-ui.UpdateOnlineUI()
+thread = threading.Thread(target=ui.UpdateOnlineUI(), daemon=True)
+thread.start()
 #thread=threading.Thread(target=ui.MinimizeToTray())
 
 wind.mainloop()

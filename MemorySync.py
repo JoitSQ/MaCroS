@@ -11,6 +11,7 @@ class MemorySync:
         self.messages = []
         self.namespace = 'MemorySync'
         self.ui = ui
+        self.RELAY = '127.0.0.1'
 
     def IDDater(self):
         self.MemoryStorageUpdater()
@@ -56,9 +57,11 @@ class MemorySync:
             Path.mkdir(rf"C:\MaCroS\P2PT\H-C\{sender}")
             open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
         rmssg = rmssg.decode('utf-8')
-        self.sendername, rmssg = rmssg.split('ͳ')
         if rmssg == 'Onlineλ':
             return
+        self.sendername, rmssg = rmssg.split('ͳ')
+        print(rmssg)
+        rmssg, senderip = rmssg.split('Σ')
         if rmssg != '':
             if self.ui.trayed:
                 notif = Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.sendername}: {rmssg}')
