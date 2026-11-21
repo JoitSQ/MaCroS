@@ -1,55 +1,41 @@
 import socket
 from tkinter import messagebox
+from winotify import Notification
 
 
 class Networking:
     def __init__(self, ui, memory):
-        self.sender=''
-        self.receivedmsg=0
-        # as proven, __init__ doesn't do shit :sob:
+        self.sender = ''
+        self.receivedmsg = False
         self.PORT = 1
         self.HOST = 'localhost'
         self.target_host = ''
         self.ui = ui
-        self.RELAY = '192.168.3.11'
+        self.RELAY = 'relay_ip_here'
         self.memory = memory
 
-    # Deprecated function, I now invented a H.O.S.T. system
-    #         |             This now means that we have THE SERVERRR!!!! My laptop will NOT pose as such with it being
-    #         V             a core to the messenger infrastructure, meaning: the IP will be fixed from now on
-    #                                        / \
-    #                       This is bullshit  |   I invented AMR, check notes
-    def IPSetinit(self):
-        with open(r"C:\MaCroS\P2PT\H-C\ipset.txt", 'r') as ipset:
-            ippp = ipset.readlines()
-            for i in range(len(ippp)):
-                if i == 0:
-                    self.host = ippp[i]
-                else:
-                    self.TARGET_HOST.append(ippp[i])
-        for i in self.host:
-            if i != '\n':
-                self.HOST += i
-
-    def SendNetwork(self):
+    def send_stop(self):
         client = self.ui.chat[self.ui.chatid]
         print(client)
         print(self.HOST)
         if client == self.HOST:
-            self.SendNetworkTest(False)
+            self.network_sender(False)
         else:
-            self.SendNetworkTest(True)
+            self.network_sender(True)
 
-    def SendNetworkTest(self, sending):
+    # I need to absolutely rewrite the entirety of this code and memory controller
+
+    def network_sender(self, sending):
         self.PORT = 1
+        # Sending username, relay parses that to an IP adress
         client = self.ui.chat[self.ui.chatid]
-        if self.ui.message.get() != '':
+        if self.ui.message.get('1.0', 'end-1c') != '':
             if sending:
                 try:
                     with (socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
                         s.settimeout(1000)
                         s.connect((self.RELAY, self.PORT))
-                        s.sendall(bytes(self.ui.nickname, 'utf-8') +bytes(self.ui.message.get(), 'utf-8') + bytes('Σ', 'utf-8') + bytes(client, 'utf-8'))
+                        s.sendall(bytes(self.ui.username, 'utf-8') + bytes(self.ui.message.get('1.0', 'end-1c'), 'utf-8') + bytes('Σ', 'utf-8') + bytes(client, 'utf-8'))
                         chk = s.recv(1024)
                         if chk==b'Rec':
                             self.memory.MemoryStorageUpdater()
@@ -59,9 +45,9 @@ class Networking:
                     messagebox.showerror('Oops!', f'Relay unavailable! \n {e}')
             else:
                 self.memory.MemoryStorageUpdater()
-    def ReceiveNetworkTest(self):
+    def network_receiver(self):
         self.PORT = 1
-        self.HOST = '26.0.2.167'
+        self.HOST = '0.0.0.0'
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.HOST, self.PORT))
             s.listen()
@@ -69,22 +55,35 @@ class Networking:
                 conn, addr = s.accept()
                 with conn:
                     data = conn.recv(4096)
+                    self.receivedmsg = True
                     plchldr, rmssg = data.decode('utf-8').split('ͳ')
                     rmssg, senderip = rmssg.split('Σ')
+                    print(plchldr, rmssg, senderip)
                     self.sender=senderip if senderip != self.RELAY else 'undefined'
-                    if "Onlineλ" not in data.decode('utf-8'):
+
+                    # It's probably not rational doing this online ping packet
+                    # bc of the user's input
+
+                    # They can easily type [@Online] themselves
+                    # Gotta change that a while later when i have a stable
+                    # networking system
+
+                    if "[@Online]" not in data.decode('utf-8'):
                         self.memory.MemoryReceiver(data, self.sender)
                         conn.send(b'Rec')
-                    if 'Onlineλ' in data.decode('utf-8'):
-                        conn.send(b'ConfirmedOnlineSentBack')
+                        if self.ui.trayed or self.sender!=self.ui.chat[self.ui.chatid]:
+                            notif = Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.sendername}: {rmssg}')
+                            notif.show()
+                    if '[@Online]' in data.decode('utf-8'):
+                        conn.send(b'[@Online]')
 
-    def IsOnline(self, client):
+    def is_online_networking(self, client):
         if client != self.HOST:
             try:
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     s.settimeout(.2)
                     s.connect((self.RELAY, self.PORT))
-                    s.send(bytes(self.ui.nickname, 'utf-8') +bytes('Onlineλ', 'utf-8') + bytes('Σ', 'utf-8') + bytes(client, 'utf-8'))
+                    s.send(bytes(self.ui.username, 'utf-8') + bytes('Onlineλ', 'utf-8') + bytes('Σ', 'utf-8') + bytes(client, 'utf-8'))
                     if b'ConfirmedOnlineSentBack' in s.recv(1024):
                         return True
             except (ConnectionRefusedError, TimeoutError, OSError):

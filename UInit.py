@@ -1,17 +1,11 @@
 # circular imports suck
 # ---------------------------------
-from functools import partial
 from tkinter import PhotoImage
 # from tkinter import messagebox
 import tkinter as win
-from pathlib import Path
 from tkinter import ttk
 from tkinter import messagebox
-import sys
 from pathlib import Path
-from winotify import Notification
-import pystray
-from PIL import Image
 
 
 class UI:
@@ -20,19 +14,24 @@ class UI:
         from MemorySync import MemorySync
         from Networking import Networking
         from Security import Security
+        from Configparser import Config
+        from BackgroundWorker import BG
 
-        self.memory = MemorySync(self)
-        self.security = Security(self)
-        self.Net = Networking(self, self.memory)
+
 
         self.state = 'b'
         self.vernumber = '0.6.4'
-        self.title = ('MaCroS ') + self.state + self.vernumber
+        self.title = 'MaCroS ' + self.state + self.vernumber
 
         windo.geometry('800x800')
         self.window = windo
-        self.window.protocol("WM_DELETE_WINDOW", self.MinimizeToTray)
         windo.title(self.title)
+
+        self.bg = BG(self)
+        self.config = Config(self)
+        self.memory = MemorySync(self)
+        self.security = Security(self)
+        self.Net = Networking(self, self.memory)
 
         self.THEbg = '#EDE8FF'
         self.bgcol = '#dde0ff'
@@ -46,20 +45,12 @@ class UI:
         #self.button = [background, text, border, light theme color, dark theme color]
         self.button = ['#A3AAFF', '#000000','#A3A6CE', "#c9cdff", "#8f80c5"]
 
-        self.chat=['26.0.2.167']
-        self.chatlabel=['Saved messages']
-        self.chatid=0
-        self.nickname=''
+        self.chat = ['Myself']
+        self.chatlabel = ['Saved messages']
+        self.chatid = 0
         self.onlined = False
         self.trayed=False
 
-        with open(r'C:\MaCroS\P2PT\config.txt') as nick:
-            for i in nick.readlines():
-                if 'Í³' in i:
-                    self.nickname=i.rstrip('Í³') + 'ͳ'
-                    break
-                else:
-                    self.nickname = 'NoNameͳ'
         self.changed=False
 
         self.backg = win.Frame(windo, bg=self.THEbg)
@@ -79,12 +70,19 @@ class UI:
             lightcolor=self.button[3],
             darkcolor=self.button[4],
             padding=5)
-        style.map("UI.TButton",background=[("active", self.button[0]),("pressed", self.button[0])],foreground=[("active", self.button[1])])
-        style.configure("Chat.TLabel", background=self.glasscol)
-        superstyle = ttk.Style()
-        superstyle.configure("Chat.Vertical.TScrollbar", background=self.sbcol, troughcolor=self.sbbg, arrowcolor=self.sbbg, lightcolor=self.glasscol, darkcolor=self.glasscol)
 
-        self.sendbi = PhotoImage(file=str(rf"{self.resource_path('Images/sendbutton.png')}"))
+        style.map("UI.TButton",background=[("active", self.button[0]),
+                                           ("pressed", self.button[0])],
+                                        foreground=[("active", self.button[1])])
+
+        style.configure("Chat.TLabel", background=self.glasscol)
+
+        style.configure("Chat.Vertical.TScrollbar", background=self.sbcol,
+                        troughcolor=self.sbbg, arrowcolor=self.sbbg,
+                        lightcolor=self.glasscol, darkcolor=self.glasscol)
+
+
+        self.sendbi = PhotoImage(file=str(rf"{self.config.resource_path('Images/sendbutton.png')}"))
 
 
         self.glass = win.Frame(self.backg, bg=self.glasscol, bd=1, relief="solid")
@@ -97,9 +95,11 @@ class UI:
         self.bottomsidebardivider = win.Frame(self.sidebarbottom, height=2, bg='#888888')
         self.sidebardivier = win.Frame(self.glass, width=2, bg="#888888")
 
+
         # So far unused
         self.popupmenu = win.Frame(self.glass, bg="#f8fbff")
         self.advanced_frame = win.Frame(self.glass, bg="#f8fbff")
+
 
         self.chatselfow = win.Frame(self.glass, bg=self.glasscol)
         self.chatwindow = win.Frame(self.glass, bg=self.glasscol)
@@ -113,25 +113,40 @@ class UI:
 
         self.chatcanvas.configure(yscrollcommand=self.chatscroller.set)
 
-        self.message = ttk.Entry(self.bottombar, width=20)
+        self.message = win.Text(self.bottombar, width=2, height=3)
 
         self.popupmenub = ttk.Button(self.chatselfow, text="Menu", command=self.popup, width=6)
+
+
         self.send = ttk.Button(self.bottombar,
                                image=self.sendbi,
                                width=3,
-                               command=self.Net.SendNetwork)
+                               command=self.Net.send_stop)
 
         self.addchatip=ttk.Entry(self.sidebartop, width=25)
+
         self.addchatname=ttk.Entry(self.sidebartop, width=25)
         self.nicknameentry = ttk.Entry(self.sidebarbottom, width=25)
 
-        self.securitywarn = ttk.Label(self.chatcanvas, text='Testing...', background=self.glasscol)
+        self.username = self.config.read_username() if Path(r'C:\MaCroS\config.txt').exists() else ''
+        self.chatuser = 'Username:'
+        self.usernamehint = 'Your Username:'
+        self.usernameupdate = 'Update Username'
+        self.testing = 'WIP'
+        self.useronline = 'User Online!'
+        self.useroffline = 'User Offline!'
+
+
+        self.securitywarn = ttk.Label(self.chatcanvas, text=self.testing, background=self.glasscol)
         self.IsOnlineText = ttk.Label(self.bottombar, text='', background = self.glasscol, style='Online.TLabel')
-        self.nicknamedisplay = ttk.Label(self.sidebarbottom, text=self.nickname.rstrip('ͳ'), background=self.bgcol)
-        self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:', background=self.bgcol)
-        self.chatnamehint = ttk.Label(self.sidebartop, text='Chat name:', background=self.bgcol)
-        self.addchat=ttk.Button(self.sidebartop, text='Add chat', command=self.CreateChat)
-        self.nicknameupdate = ttk.Button(self.sidebarbottom, text='Update nickname', command=self.UpdateNickname)
+        self.nicknamedisplay = ttk.Label(self.sidebarbottom, text=self.username.rstrip('ͳ'), background=self.bgcol)
+
+        # self.chatiphint = ttk.Label(self.sidebartop, text='Chat IP:', background=self.bgcol)
+
+        self.chatnamehint = ttk.Label(self.sidebartop, text=self.chatuser, background=self.bgcol)
+        self.addchat=ttk.Button(self.sidebartop, text='Add chat', command=self.chat_creator)
+        self.nicknameupdate = ttk.Button(self.sidebarbottom, text=self.usernameupdate, command=self.config.update_username)
+
         self.close = ttk.Button(self.popupmenu, text='✕', command=self.popupdestroy, width=3)
         self.updateipsetb = ttk.Button(self.advanced_frame, text='Update Host IP')
         self.debugbtn = ttk.Button(self.advanced_frame, text="Debug info")
@@ -142,8 +157,9 @@ class UI:
 
         self.sidebartop.pack(side='top', fill='y', pady=5)
 
-        self.chatiphint.pack(anchor='nw', padx=5)
-        self.addchatip.pack(padx=5, pady=1)
+        # self.chatiphint.pack(anchor='nw', padx=5)
+        # self.addchatip.pack(padx=5, pady=1)
+
         self.chatnamehint.pack(anchor='nw', padx=5)
         self.addchatname.pack(padx=5)
         self.addchat.pack(anchor='nw', padx=5, pady=5)
@@ -189,36 +205,11 @@ class UI:
         self.inshadowtext = ''
 
 
+    def horrible_wrong(self, error):
+        messagebox.showerror('Uh-oh!', f'Please look for a github issue with following code: {self.config.error_parse(error)}')
 
-    def MinimizeToTray(self):
-        self.trayed=True
-        self.window.withdraw()
-        image = Image.open(str(rf"{self.resource_path('Images/icon.png')}"))
 
-        menu = pystray.Menu(
-            pystray.MenuItem("Open MaCroS", self.ShowWindow),
-            pystray.MenuItem("Quit", self.Quit)
-        )
-
-        self.tray_icon = pystray.Icon(
-            "MaCroS",
-            image,
-            "MaCroS",
-            menu
-        )
-
-        self.tray_icon.run()
-
-    def ShowWindow(self, icon, item):
-        icon.stop()
-        self.trayed=False
-        self.window.after(0, self.window.deiconify)
-
-    def Quit(self, icon, item):
-        icon.stop()
-        self.window.after(0, self.window.destroy)
-
-    def NewMessage(self, msg, dir):
+    def message_new(self, msg, direction):
         message = ttk.Label(
             self.chatF,
             text=msg,
@@ -227,139 +218,56 @@ class UI:
             justify='left'
         )
 
-        if dir == 'out':
+        if direction == 'out':
             message.pack(
                 anchor='e',
                 padx=10,
                 pady=3
             )
 
-        elif dir == 'in':
+        elif direction == 'in':
             message.pack(
                 anchor='w',
                 padx=10,
                 pady=3
             )
 
-    def resource_path(self, relative_path):
-        if getattr(sys, 'frozen', False):
-            base_path = Path(sys._MEIPASS)
-        else:
-            base_path = Path(__file__).parent
-        return base_path / relative_path
 
-    def UpdateNickname(self):
-        self.nickname = self.nicknameentry.get() + 'ͳ'
-        self.nicknamedisplay.configure(text=self.nicknameentry.get())
-        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'w', encoding='utf-8')
-        for i in self.chat:
-            chatlist.write(i)
-            chatlist.write('\n')
-        chatlist.write('Ϡ')
-        chatlist.write('\n')
-        for i in self.chatlabel:
-            chatlist.write(i)
-            chatlist.write('\n')
-        chatlist.write('Ϡ')
-        chatlist.write('\n')
-        chatlist.write(self.nickname)
-        chatlist.close()
-        self.nicknameentry.delete(0, win.END)
-
-    def IsOnlineUI(self):
-        if self.Net.IsOnline(self.chat[self.chatid]):
-            return True
-        else:
-            return False
-
-    def ButtonCreate(self, chat_id, chat_name):
-        button = ttk.Button(self.sidebarchats, text=f'{chat_name}', command=lambda: self.OpenChat(chat_id))
+    def button_creator(self, chat_id, chat_name):
+        button = ttk.Button(self.sidebarchats, text=f'{chat_name}', command=lambda: self.config.chat_open(chat_id))
         button.pack(fill="x", padx=5, pady=2)
         return button
 
-    def UpdaterButtons(self):
+
+    def button_updater(self):
         for i in range(len(self.chat)):
-            self.ButtonCreate(self.chat[i], self.chatlabel[i])
-
-    def OpenChat(self, chatid):
-        for i in range(len(self.chat)):
-            if self.chat[i] == chatid:
-                self.chatid = i
-
-        chatpath = Path(
-            rf"C:\MaCroS\P2PT\H-C\{chatid}"
-        )
-
-        if not chatpath.exists():
-            chatpath.mkdir()
-            open(
-                chatpath / 'history-client.txt',
-                'a',
-                encoding='utf-8'
-            ).close()
-
-        self.memory.IDDater()
-
-        self.LoadMessages()
+            self.button_creator(self.chat[i], self.chatlabel[i])
 
 
-    def CreateChat(self):
+    def chat_creator(self):
         chatname=self.addchatname.get()
-        chatip=self.addchatip.get()
+        # chatip=self.addchatip.get()
         self.addchatip.delete('0', win.END)
         self.addchatname.delete('0', win.END)
-        self.chat.append(chatip)
+        self.chat.append(chatname)
         self.chatlabel.append(chatname)
-        self.ButtonCreate(chatip, chatname)
-        self.UpdateChatlist()
+        self.button_creator(chatname, chatname)
+        self.config.update_nameplates()
 
-    def UpdateChatlist(self):
-        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'w', encoding='utf-8')
-        for i in self.chat:
-            chatlist.write(i)
-            chatlist.write('\n')
-        chatlist.write('Ϡ')
-        chatlist.write('\n')
-        for i in self.chatlabel:
-            chatlist.write(i)
-            chatlist.write('\n')
-        chatlist.write(self.nickname)
-        chatlist.close()
 
-    def ReadChatList(self):
-        c=0
-        self.chat=[]
-        self.chatlabel=[]
-        chatlist = open(r"C:\MaCroS\P2PT\config.txt", 'r', encoding='utf-8')
+    # Deprecated
+    def init_menu(self):
 
-        chatlisttemp = chatlist.readlines()
-
-        for i in chatlisttemp:
-            i=i.rstrip('\n')
-            if c==0 and 'Ϡ' not in i:
-                self.chat.append(i)
-            elif c==1 and 'Ϡ' not in i:
-                self.chatlabel.append(i)
-            elif c==2 and 'Ϡ' not in i:
-                self.nickname=i
-            if 'Ϡ' in i:
-                c+=1
-
-    def MenuInit(self):
-        # Initializing the closing menu button
-
-        # Packing said button in its place
-
-        # Packing the Frames themselves
         self.debugbtn.pack(anchor="e", pady=5)
         self.updateipsetb.pack(side='bottom', anchor='e', pady=10)
         self.clearhst.pack(anchor='e', pady=5)
         self.advanced_frame.pack(side="bottom", anchor="e", padx=15, pady=15)
         self.popupmenu.pack(side="top", anchor="e", padx=10, pady=10)
 
+    # Deprecated
     def popup(self):
         # Add items to the popup menu
-        self.MenuInit()
+        self.init_menu()
         # Destroy the button to call the popup
         self.message.pack_forget()
         self.chatwindow.pack_forget()
@@ -367,6 +275,7 @@ class UI:
         self.chatwindow.pack_forget()
         # Reloading the popup menu button
 
+    # Deprecated
     def popupdestroy(self):
         # Well... destroying the popup menu
         self.advanced_frame.pack_forget()
@@ -376,6 +285,7 @@ class UI:
         # Reloading popupmenu
         self.mainmenuinit()
 
+    # Deprecated
     def mainmenuinit(self):
         self.glass.pack(
             padx=30,
@@ -396,7 +306,8 @@ class UI:
             pady=5
         )
 
-    def LoadMessages(self):
+
+    def messages_load(self):
 
         self.chatcanvas.yview_moveto(0)
         # Remove currently displayed messages
@@ -405,46 +316,40 @@ class UI:
 
         # Create every message
         for message in self.memory.messages:
-            self.NewMessage(message[0], message[3])
+            self.message_new(message[0], message[3])
 
         # Scroll to bottom
         self.chatcanvas.update_idletasks()
         self.chatcanvas.configure(scrollregion=self.chatcanvas.bbox("all"))
         self.chatcanvas.yview_moveto(1)
 
-    def UpdateIncomingMessages(self):
+
+    def incoming_updater(self):
         if self.changed:
-            self.LoadMessages()
+            self.messages_load()
 
             self.changed=False
-        self.window.after(100, self.UpdateIncomingMessages)
+        self.window.after(100, self.incoming_updater)
 
-    def UpdateChatListIncoming(self):
-        if self.Net.receivedmsg==1 and self.Net.sender not in self.chat:
-            self.ButtonCreate(self.Net.sender, self.memory.sendername)
+    def chatlist_update_incoming(self):
+        if self.Net.receivedmsg and self.Net.sender not in self.chat:
+
+            self.button_creator(self.Net.sender, self.memory.sendername)
             self.chat.append(self.Net.sender)
             self.chatlabel.append(self.memory.sendername)
-            self.OpenChat(self.Net.sender)
-            self.UpdateChatlist()
-            self.Net.receivedmsg=0
-        self.window.after(100, self.UpdateChatListIncoming)
+            # self.config.OpenChat(self.Net.sender)
+            self.config.update_nameplates()
+            self.Net.receivedmsg = False
+        self.window.after(100, self.chatlist_update_incoming)
 
-    def UpdateOnline(self):
-        check = self.Net.IsOnline(self.chat[self.chatid])
-        if check:
-            self.onlined = True
-        elif not check:
-            self.onlined=False
-        else:
-            self.onlined = 'hide'
-        self.window.after(300, self.UpdateOnline)
 
-    def UpdateOnlineUI(self):
-        if self.chat[self.chatid]==self.Net.HOST:
+    def online_updater(self):
+        self.onlined = True if self.Net.is_online_networking(self.chat[self.chatid]) else False
+        if self.chat[self.chatid]==self.username:
             self.IsOnlineText.configure(text='', style='Offline.TLabel')
             self.securitywarn.configure(text='')
         elif self.onlined:
-            self.IsOnlineText.configure(text='User online!', style='Online.TLabel')
+            self.IsOnlineText.configure(text=self.useronline, style='Online.TLabel')
         elif not self.onlined:
-            self.IsOnlineText.configure(text='User offline!', style='Offline.TLabel')
-        self.window.after(500, self.UpdateOnlineUI)
+            self.IsOnlineText.configure(text=self.useroffline, style='Offline.TLabel')
+        self.window.after(10000, self.online_updater)

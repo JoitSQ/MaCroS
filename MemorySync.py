@@ -1,7 +1,6 @@
 import time
 from pathlib import Path
 import tkinter
-from winotify import Notification
 
 class MemorySync:
     msgindex = 0
@@ -11,13 +10,13 @@ class MemorySync:
         self.messages = []
         self.namespace = 'MemorySync'
         self.ui = ui
-        self.RELAY = '127.0.0.1'
+        self.RELAY = '127.0.0.1' # wtf
 
     def IDDater(self):
         self.MemoryStorageUpdater()
         self.messages = []
 
-        history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
+        history = open(rf"C:\MaCroS\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'r', encoding='utf-8')
 
         for line in history:
             message = line.rstrip('\n').split('⁝')
@@ -29,33 +28,33 @@ class MemorySync:
         history.close()
 
     def MemoryStorageUpdater(self):
-        if Path(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}").exists():
+        if Path(rf"C:\MaCroS\{self.ui.chat[self.ui.chatid]}").exists():
             pass
         else:
-            Path.mkdir(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}")
-            open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
-        self.messageinput = self.ui.message.get()
+            Path(rf"C:\MaCroS\{self.ui.chat[self.ui.chatid]}").mkdir()
+            open(rf"C:\MaCroS\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
+        self.messageinput = self.ui.message.get('1.0', 'end-1c')
         if self.messageinput != '':
-            history = open(rf"C:\MaCroS\P2PT\H-C\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
+            history = open(rf"C:\MaCroS\{self.ui.chat[self.ui.chatid]}\history-client.txt", 'a', encoding='utf-8')
             history.write(self.messageinput + f'⁝{self.msgindex}⁝{time.time()}⁝out' + '\n')
             history.close()
 
-            self.ui.message.delete('0', tkinter.END)
+            self.ui.message.delete('1.0', 'end-1c')
 
             self.msgindex += 1
             self.ui.changed = True
             self.IDDater()
 
     def MemoryForgor(self):
-        history = open(r"C:\MaCroS\P2PT\H-C\history-client.txt", 'w')
+        history = open(r"C:\MaCroS\history-client.txt", 'w')
         history.close()
 
     def MemoryReceiver(self, rmssg, sender):
-        if Path(rf"C:\MaCroS\P2PT\H-C\{sender}").exists():
+        if Path(rf"C:\MaCroS\{sender}").exists():
             pass
         else:
-            Path.mkdir(rf"C:\MaCroS\P2PT\H-C\{sender}")
-            open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
+            Path.mkdir(rf"C:\MaCroS\{sender}")
+            open(rf"C:\MaCroS\{sender}\history-client.txt", 'a', encoding='utf-8')
         rmssg = rmssg.decode('utf-8')
         if rmssg == 'Onlineλ':
             return
@@ -63,18 +62,15 @@ class MemorySync:
         print(rmssg)
         rmssg, senderip = rmssg.split('Σ')
         if rmssg != '':
-            if self.ui.trayed:
-                notif = Notification(app_id='MaCroS', title="You've got mail!", msg=f'{self.sendername}: {rmssg}')
-                notif.show()
             self.ui.inshadowtext = 123123
             self.inmsgindex += 1
-            history = open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'a', encoding='utf-8')
+            history = open(rf"C:\MaCroS\{sender}\history-client.txt", 'a', encoding='utf-8')
             history.write(rmssg + f'⁝{self.inmsgindex}⁝{time.time()}⁝in' + '\n')
             history.close()
         elif rmssg == '':
             pass
         self.messages = []
-        history = open(rf"C:\MaCroS\P2PT\H-C\{sender}\history-client.txt", 'r', encoding='utf-8')
+        history = open(rf"C:\MaCroS\{sender}\history-client.txt", 'r', encoding='utf-8')
         for line in history:
             message = line.rstrip('\n').split('⁝')
             message[2] = float(message[2])

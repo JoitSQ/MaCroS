@@ -2,6 +2,9 @@ import sys
 import threading
 import socket
 
+
+clients = []
+clients_user = []
 HOST = "0.0.0.0"
 PORT = 1
 
@@ -20,6 +23,8 @@ def OpenConnection():
 def ConnMaint(conn, addr):
         with conn:
             print("Connected:", addr)
+            if addr not in clients:
+                clients.append(addr[0])
 
             while True:
                 data = conn.recv(4096)
@@ -34,9 +39,10 @@ def ConnMaint(conn, addr):
                 mssg, client = data.split('Σ'.encode('utf-8'), 1)
                 print(mssg, client)
                 print((str(client.decode())))
+
                 try:
                     with socket.create_connection(
-                            (client.decode('utf-8'), 1),
+                            (client_parse(client.decode('utf-8')), 1),
                             timeout=5
                     ) as s:
                         s.settimeout(5)
@@ -50,5 +56,13 @@ def ConnMaint(conn, addr):
                 except OSError as e:
                     print(f"Forwarding failed: {e}")
                     conn.sendall(b'Failed')
+
+def client_parse(c):
+    p=0
+    for i in clients_user:
+        if i==c:
+            return clients[p]
+        p+=1
+
 
 OpenConnection()

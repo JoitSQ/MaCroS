@@ -12,3 +12,4 @@ class Security:
             self.ui.securitywarn.configure(text='End-to-End Encrypted.')
         if self.privatekey==self.publickey:
             self.ui.securitywarn.configure(text='Keys are matching. Security may be at risk.')
+
